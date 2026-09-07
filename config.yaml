@@ -35,3 +35,11 @@ rois:
 tracking:
   max_distance_threshold: 60.0
   max_disappeared_frames: 10
+
+dataset:
+  enabled: true
+  save_interval_seconds: 2.0
+  max_images_per_session: 5000
+  min_frame_difference: 0.05
+  dataset_dir: "dataset"
+  save_raw: true

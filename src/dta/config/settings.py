@@ -33,6 +33,17 @@ class TrackingSettings(BaseModel):
     max_disappeared_frames: int = 10
 
 
+class DatasetSettings(BaseModel):
+    """Dataset capture and deduplication configuration."""
+
+    enabled: bool = True
+    save_interval_seconds: float = 2.0
+    max_images_per_session: int = 5000
+    min_frame_difference: float = 0.05
+    dataset_dir: str = "dataset"
+    save_raw: bool = True
+
+
 class Settings(BaseSettings):
     """Main application settings loaded from config.yaml or defaults."""
 
@@ -47,6 +58,7 @@ class Settings(BaseSettings):
     ui_scale: str = "auto"
     rois: ROISettings = Field(default_factory=ROISettings)
     tracking: TrackingSettings = Field(default_factory=TrackingSettings)
+    dataset: DatasetSettings = Field(default_factory=DatasetSettings)
 
     @classmethod
     def load_from_yaml(cls, config_path: str | Path = "config.yaml") -> "Settings":
