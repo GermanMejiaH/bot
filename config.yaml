@@ -1,0 +1,37 @@
+# Dofus Tactical Assistant (DTA) - Runtime Configuration
+
+window_name: "Dofus"
+capture_fps: 15
+ocr_provider: "easyocr"
+ocr_language: "fr"
+ocr_update_interval: 0.25
+debug_mode: true
+
+
+supported_resolutions:
+  - "1920x1080"
+  - "1366x768"
+
+ui_scale: "auto"
+
+# Default Region of Interest (ROI) relative boundaries or pixel crops for HUD (1920x1080 base)
+rois:
+  pa:
+    x_min: 800
+    y_min: 980
+    x_max: 860
+    y_max: 1040
+  pm:
+    x_min: 870
+    y_min: 980
+    x_max: 930
+    y_max: 1040
+  hp:
+    x_min: 940
+    y_min: 980
+    x_max: 1020
+    y_max: 1040
+
+tracking:
+  max_distance_threshold: 60.0
+  max_disappeared_frames: 10
