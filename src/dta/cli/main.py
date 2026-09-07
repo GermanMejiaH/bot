@@ -9,6 +9,7 @@ import typer
 from dta.config.settings import get_settings
 from dta.core.logger import logger
 from dta.events.event_bus import get_event_bus
+from dta.services.dataset_capture import DatasetCaptureService
 from dta.services.frame_pipeline import FramePipeline
 from dta.services.screen_capture import ScreenCaptureService
 from dta.vision.window_finder import WindowFinder
@@ -55,11 +56,13 @@ def debug(
     # Initialize perception services
     pipeline = FramePipeline(settings=settings, event_bus=event_bus)
     capture_service = ScreenCaptureService(settings=settings, event_bus=event_bus)
+    dataset_service = DatasetCaptureService(settings=settings, event_bus=event_bus)
     overlay = DebugOverlay(event_bus=event_bus, save_screenshots=save_screenshots)
 
     typer.echo("Starting perception pipeline... Press 'Q' in the overlay window to stop.")
 
     pipeline.start_listening()
+    dataset_service.start_listening()
     overlay.start_listening()
     capture_service.start()
 
@@ -74,6 +77,7 @@ def debug(
         logger.info("KeyboardInterrupt detected. Shutting down debug session...")
     finally:
         overlay.close()
+        dataset_service.stop_listening()
         pipeline.stop_listening()
         capture_service.stop()
         typer.secho("Debug perception session stopped cleanly.", fg=typer.colors.GREEN)
