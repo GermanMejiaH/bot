@@ -44,6 +44,13 @@ class DatasetSettings(BaseModel):
     save_raw: bool = True
 
 
+class DebugSettings(BaseModel):
+    """Debug overlay and validation visualizer configuration."""
+
+    save_detection_overlays: bool = True
+    output_dir: str = "debug_captures/validation"
+
+
 class Settings(BaseSettings):
     """Main application settings loaded from config.yaml or defaults."""
 
@@ -53,6 +60,7 @@ class Settings(BaseSettings):
     ocr_language: str = "fr"
     ocr_update_interval: float = 0.25
     debug_mode: bool = True
+    debug: DebugSettings = Field(default_factory=DebugSettings)
 
     supported_resolutions: list[str] = Field(default_factory=lambda: ["1920x1080", "1366x768"])
     ui_scale: str = "auto"

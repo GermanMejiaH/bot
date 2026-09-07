@@ -7,6 +7,10 @@ ocr_language: "fr"
 ocr_update_interval: 0.25
 debug_mode: true
 
+debug:
+  save_detection_overlays: true
+  output_dir: "debug_captures/validation"
+
 
 supported_resolutions:
   - "1920x1080"
