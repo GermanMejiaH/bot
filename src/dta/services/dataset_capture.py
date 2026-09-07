@@ -9,12 +9,24 @@ from typing import Any
 
 import cv2
 import numpy as np
+from pydantic import BaseModel
 
 from dta.config.settings import Settings, get_settings
 from dta.core.logger import logger
 from dta.events.event_bus import EventBus, get_event_bus
 from dta.events.events import GameStateUpdated
 from dta.models.game_state import GameState
+
+
+class DatasetMetrics(BaseModel):
+    """Real-time capture and deduplication metrics model."""
+
+    total_frames_seen: int = 0
+    total_frames_saved: int = 0
+    duplicate_frames_skipped: int = 0
+    combat_frames_saved: int = 0
+    exploration_frames_saved: int = 0
+    average_frame_difference: float = 0.0
 
 
 class DatasetCaptureService:
@@ -44,9 +56,18 @@ class DatasetCaptureService:
 
         self._ensure_directories()
 
+        self._session_start_time: float = time.time()
         self._last_capture_time: float = 0.0
         self._last_captured_frame: np.ndarray | None = None
+
+        self._total_frames_seen: int = 0
         self._captured_count: int = 0
+        self._duplicate_frames_skipped: int = 0
+        self._combat_frames_saved: int = 0
+        self._exploration_frames_saved: int = 0
+        self._diff_sum: float = 0.0
+        self._diff_count: int = 0
+
         self._is_listening: bool = False
         self._lock = threading.RLock()
 
@@ -69,21 +90,59 @@ class DatasetCaptureService:
         with self._lock:
             return self._is_listening
 
+    def get_metrics(self) -> DatasetMetrics:
+        """Return a snapshot of current dataset capture metrics."""
+        with self._lock:
+            avg_diff = (self._diff_sum / self._diff_count) if self._diff_count > 0 else 0.0
+            return DatasetMetrics(
+                total_frames_seen=self._total_frames_seen,
+                total_frames_saved=self._captured_count,
+                duplicate_frames_skipped=self._duplicate_frames_skipped,
+                combat_frames_saved=self._combat_frames_saved,
+                exploration_frames_saved=self._exploration_frames_saved,
+                average_frame_difference=round(avg_diff, 4),
+            )
+
+    def generate_session_report(self, report_filename: str = "report.json") -> str:
+        """Generate and save session execution metrics report JSON to dataset directory."""
+        with self._lock:
+            metrics = self.get_metrics()
+            now = time.time()
+            start_iso = datetime.fromtimestamp(self._session_start_time, tz=UTC).isoformat()
+            end_iso = datetime.fromtimestamp(now, tz=UTC).isoformat()
+            duration = round(now - self._session_start_time, 2)
+
+            report_data = {
+                "session_start_time": start_iso,
+                "session_end_time": end_iso,
+                "duration_seconds": duration,
+                "metrics": metrics.model_dump(),
+            }
+
+            report_path = os.path.join(self.dataset_dir, report_filename)
+            with open(report_path, "w", encoding="utf-8") as f:
+                json.dump(report_data, f, indent=2)
+
+            logger.info(f"Generated dataset session report: {report_path}")
+            return report_path
+
     def start_listening(self) -> None:
         """Subscribe service to GameStateUpdated events on EventBus."""
         with self._lock:
             if not self._is_listening:
+                self._session_start_time = time.time()
                 self.event_bus.subscribe(GameStateUpdated, self.on_game_state_updated)
                 self._is_listening = True
                 logger.info("DatasetCaptureService subscribed to GameStateUpdated events.")
 
     def stop_listening(self) -> None:
-        """Unsubscribe service from GameStateUpdated events on EventBus."""
+        """Unsubscribe service from GameStateUpdated events on EventBus and generate session report."""
         with self._lock:
             if self._is_listening:
                 self.event_bus.unsubscribe(GameStateUpdated, self.on_game_state_updated)
                 self._is_listening = False
                 logger.info("DatasetCaptureService unsubscribed from GameStateUpdated events.")
+                self.generate_session_report()
 
     def compute_phash(self, image: np.ndarray) -> str:
         """Compute a 64-bit difference perceptual hash (dHash) string for an image."""
@@ -144,6 +203,8 @@ class DatasetCaptureService:
             if not self.enabled:
                 return None
 
+            self._total_frames_seen += 1
+
             if self._captured_count >= self.max_images_per_session:
                 logger.debug("Dataset capture limit reached for current session.")
                 return None
@@ -160,9 +221,16 @@ class DatasetCaptureService:
             diff = 1.0
             if self._last_captured_frame is not None:
                 diff = self.compute_frame_difference(self._last_captured_frame, frame_img)
+                self._diff_sum += diff
+                self._diff_count += 1
+
                 if diff < self.min_frame_difference:
+                    self._duplicate_frames_skipped += 1
                     logger.debug(f"Skipped duplicate frame (diff={diff:.4f} < min={self.min_frame_difference}).")
                     return None
+            else:
+                self._diff_sum += 1.0
+                self._diff_count += 1
 
             # Classification & Save
             is_combat = self.is_combat_active(game_state)
@@ -213,6 +281,11 @@ class DatasetCaptureService:
             self._last_capture_time = now
             self._last_captured_frame = frame_img.copy()
             self._captured_count += 1
+
+            if is_combat:
+                self._combat_frames_saved += 1
+            else:
+                self._exploration_frames_saved += 1
 
             logger.info(
                 f"Saved dataset sample [{self._captured_count}/{self.max_images_per_session}] -> "

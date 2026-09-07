@@ -99,7 +99,80 @@ To prevent filling storage with hundreds of identical idle frames when standing 
 
 ---
 
-## 6. Guide: Preparing the Dataset for YOLOv8 Training
+## 6. Dataset Validation Mode & Analytics
+
+### Real-Time Session Metrics & `dataset/report.json`
+`DatasetCaptureService` tracks live execution metrics during bot operation:
+- `total_frames_seen`: Total frames received from pipeline
+- `total_frames_saved`: Samples written to disk
+- `duplicate_frames_skipped`: Near-identical frames skipped by deduplication
+- `combat_frames_saved`: Combat category sample count
+- `exploration_frames_saved`: Exploration category sample count
+- `average_frame_difference`: Running average structural difference
+
+When a capture session terminates (`stop_listening()`), `dataset/report.json` is generated automatically:
+
+```json
+{
+  "session_start_time": "2026-09-07T15:45:00.000000+00:00",
+  "session_end_time": "2026-09-07T15:47:00.000000+00:00",
+  "duration_seconds": 120.0,
+  "metrics": {
+    "total_frames_seen": 1500,
+    "total_frames_saved": 450,
+    "duplicate_frames_skipped": 1050,
+    "combat_frames_saved": 300,
+    "exploration_frames_saved": 150,
+    "average_frame_difference": 0.1245
+  }
+}
+```
+
+### Dataset Analysis CLI (`scripts/analyze_dataset.py`)
+To inspect dataset health, class distribution, resolution breakdown, and OCR metrics, run:
+
+```bash
+python scripts/analyze_dataset.py --dataset-dir dataset
+```
+
+#### Output Example:
+```text
+============================================================
+           DOFUS 3 BOT - DATASET ANALYSIS REPORT           
+============================================================
+Dataset Root Directory : C:\Users\Andres\Desktop\bot\dataset
+Total Saved Images     : 450
+Total Metadata Files   : 450
+Unique Perceptual Hashes: 412
+
+------------------------------------------------------------
+ CATEGORY BREAKDOWN
+------------------------------------------------------------
+  • combat       :   300 images |   300 jsons
+  • exploration  :   150 images |   150 jsons
+  • raw          :   450 images |   450 jsons
+  • validation   :     0 images |     0 jsons
+
+------------------------------------------------------------
+ STATE DISTRIBUTION
+------------------------------------------------------------
+  • Combat      :   300 samples ( 66.7%)
+  • Exploration :   150 samples ( 33.3%)
+
+------------------------------------------------------------
+ OCR & PERCEPTION METRICS (AVERAGES)
+------------------------------------------------------------
+  • Average PA           : 11.0
+  • Average PM           : 6.0
+  • Average HP           : 5279.0
+  • Avg Entities / Frame : 3.45
+  • Avg Frame Difference : 0.1245
+============================================================
+```
+
+---
+
+## 7. Guide: Preparing the Dataset for YOLOv8 Training
 
 Once thousands of frames have been collected automatically, follow these steps to label and convert the dataset into YOLOv8 format:
 
