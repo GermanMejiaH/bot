@@ -332,6 +332,27 @@ class CharacterDetector:
             candidate_counter += 1
 
             passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            fill_ratio = cnt_area / bbox_area if bbox_area > 0 else 0.0
+            edge_region = edges[y : y + h, x : x + w]
+            edge_density = float(np.count_nonzero(edge_region) / bbox_area) if bbox_area > 0 else 0.0
+
+            diagnostics = {
+                "contour_area": cnt_area,
+                "bounding_rect_area": bbox_area,
+                "fill_ratio": round(fill_ratio, 4),
+                "edge_density": round(edge_density, 4),
+            }
+
+            triggered_rules = ["canny_edge_extract"]
+            if passed:
+                triggered_rules.extend([
+                    "min_max_width_pass",
+                    "min_max_height_pass",
+                    "min_max_area_pass",
+                    "aspect_ratio_pass",
+                    "contour_fill_ratio_pass",
+                ])
+
             lifecycle = [
                 {"stage": "contour_detection", "accepted": True, "reason": "contour_extracted"},
                 {"stage": "filtering", "accepted": passed, "reason": filter_reason},
@@ -347,6 +368,8 @@ class CharacterDetector:
                 accepted=passed,
                 reason=filter_reason,
                 lifecycle=lifecycle,
+                diagnostics=diagnostics,
+                triggered_rules=triggered_rules,
             )
             all_candidates.append(det)
             if passed:
@@ -373,6 +396,37 @@ class CharacterDetector:
             candidate_counter += 1
 
             passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            mask_crop = closed_hsv[y : y + h, x : x + w]
+            mask_pixels = int(np.count_nonzero(mask_crop))
+            mask_ratio = round(mask_pixels / bbox_area, 4) if bbox_area > 0 else 0.0
+            fill_ratio = round(cnt_area / bbox_area, 4) if bbox_area > 0 else 0.0
+
+            hsv_crop = hsv[y : y + h, x : x + w, 0]
+            non_zero_hues = hsv_crop[mask_crop > 0]
+            if len(non_zero_hues) > 0:
+                vals, counts = np.unique(non_zero_hues, return_counts=True)
+                dominant_hue = int(vals[np.argmax(counts)])
+            else:
+                dominant_hue = 0
+
+            diagnostics = {
+                "mask_pixels": mask_pixels,
+                "mask_ratio": mask_ratio,
+                "dominant_hue": dominant_hue,
+                "contour_area": cnt_area,
+                "fill_ratio": fill_ratio,
+            }
+
+            triggered_rules = ["hsv_segmentation_pass", "green_tile_exclusion_pass"]
+            if passed:
+                triggered_rules.extend([
+                    "min_max_width_pass",
+                    "min_max_height_pass",
+                    "min_max_area_pass",
+                    "aspect_ratio_pass",
+                    "contour_fill_ratio_pass",
+                ])
+
             lifecycle = [
                 {"stage": "hsv_detection", "accepted": True, "reason": "hsv_segmented"},
                 {"stage": "filtering", "accepted": passed, "reason": filter_reason},
@@ -388,6 +442,8 @@ class CharacterDetector:
                 accepted=passed,
                 reason=filter_reason,
                 lifecycle=lifecycle,
+                diagnostics=diagnostics,
+                triggered_rules=triggered_rules,
             )
             all_candidates.append(det)
             if passed:
@@ -419,6 +475,7 @@ class CharacterDetector:
                 crop_mask = ring_mask[y : y + h, x : x + w]
                 fill_ratio = np.count_nonzero(crop_mask) / float(w * h) if (w * h) > 0 else 1.0
 
+                sat_std, val_std = 0.0, 0.0
                 if fill_ratio >= 0.42:
                     body_hsv = hsv[max(0, y - int(h * 1.8)) : y, x : x + w]
                     sat_std = float(np.std(body_hsv[:, :, 1])) if body_hsv.size > 0 else 0.0
@@ -439,7 +496,14 @@ class CharacterDetector:
                     continue
 
                 blue_crop = closed_blue[y : y + h, x : x + w]
-                has_blue = bool(np.count_nonzero(blue_crop) > 10)
+                red_crop = closed_red[y : y + h, x : x + w]
+                red_pixels = int(np.count_nonzero(red_crop))
+                blue_pixels = int(np.count_nonzero(blue_crop))
+                ring_area = float(w * h)
+                red_ratio = round(red_pixels / ring_area, 4) if ring_area > 0 else 0.0
+                blue_ratio = round(blue_pixels / ring_area, 4) if ring_area > 0 else 0.0
+                mask_area = int(np.count_nonzero(crop_mask))
+                has_blue = bool(blue_pixels > 10)
 
                 base_candidates.append({
                     "bbox": [x, y, w, h],
@@ -447,6 +511,14 @@ class CharacterDetector:
                     "cy": y + h / 2.0,
                     "fill_ratio": fill_ratio,
                     "has_blue": has_blue,
+                    "red_pixels": red_pixels,
+                    "blue_pixels": blue_pixels,
+                    "red_ratio": red_ratio,
+                    "blue_ratio": blue_ratio,
+                    "mask_area": mask_area,
+                    "sat_std": sat_std,
+                    "val_std": val_std,
+                    "edge_density": edge_density,
                 })
 
         filtered_base_candidates: list[dict[str, Any]] = []
@@ -475,6 +547,7 @@ class CharacterDetector:
             flat_indices = indices.flatten() if hasattr(indices, "flatten") else list(indices)
             for idx in flat_indices:
                 x, y, w, h = base_boxes[int(idx)]
+                c_info = filtered_base_candidates[int(idx)]
                 bottom_y = y + h
                 sprite_h = max(int(h * 4.8), int(w * 2.4))
                 char_y = max(0, bottom_y - sprite_h)
@@ -483,6 +556,27 @@ class CharacterDetector:
 
                 cid = candidate_counter
                 candidate_counter += 1
+
+                diagnostics = {
+                    "red_pixels": c_info["red_pixels"],
+                    "blue_pixels": c_info["blue_pixels"],
+                    "red_ratio": c_info["red_ratio"],
+                    "blue_ratio": c_info["blue_ratio"],
+                    "mask_area": c_info["mask_area"],
+                    "fill_ratio": round(c_info["fill_ratio"], 4),
+                    "sat_std": round(c_info["sat_std"], 2),
+                    "val_std": round(c_info["val_std"], 2),
+                    "edge_density": round(c_info["edge_density"], 4),
+                    "has_blue": c_info["has_blue"],
+                    "ring_w": w,
+                    "ring_h": h,
+                }
+                triggered_rules = [
+                    "hsv_color_ring_pass",
+                    "dim_aspect_ratio_pass",
+                    "fill_sat_val_pass",
+                    "sprite_edge_density_pass",
+                ]
 
                 lifecycle = [
                     {"stage": "combat_base_detection", "accepted": True, "reason": "ring_base_extracted"},
@@ -499,6 +593,8 @@ class CharacterDetector:
                     accepted=True,
                     reason="passed_filtering",
                     lifecycle=lifecycle,
+                    diagnostics=diagnostics,
+                    triggered_rules=triggered_rules,
                 )
                 all_candidates.append(det)
                 combat_base_accepted.append(det)
@@ -528,6 +624,8 @@ class CharacterDetector:
                     candidate.lifecycle.append({"stage": "final_selection", "accepted": True, "reason": "final_selected"})
                     candidate.accepted = True
                     candidate.reason = "final_selected"
+                    if "nms_survived" not in candidate.triggered_rules:
+                        candidate.triggered_rules.append("nms_survived")
                     merged_accepted.append(candidate)
                 else:
                     candidate.lifecycle.append({"stage": "nms", "accepted": False, "reason": "suppressed_by_nms"})

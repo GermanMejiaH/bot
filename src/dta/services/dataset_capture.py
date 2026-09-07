@@ -276,6 +276,8 @@ class DatasetCaptureService:
                 "reason": det.reason,
                 "crop_file": crop_filename,
                 "lifecycle": det.lifecycle,
+                "diagnostics": det.diagnostics,
+                "triggered_rules": det.triggered_rules,
             })
 
         # 3. Trace Overlay

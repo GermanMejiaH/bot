@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DTA Detection Audit Gallery — COMBAT_BASE</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #4fc3f7;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .summary-bar {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            font-size: 1.1em;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #1e1e1e;
+            border-radius: 8px;
+            border: 1px solid #333;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .card-accepted {
+            border-left: 5px solid #66bb6a;
+        }
+        .card-rejected {
+            border-left: 5px solid #ef5350;
+        }
+        .card-header {
+            background: #252525;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .candidate-id {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .badge-success { background: #2e7d32; color: #fff; }
+        .badge-danger { background: #c62828; color: #fff; }
+        .card-body {
+            padding: 15px;
+        }
+        .image-container {
+            text-align: center;
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 180px;
+            border: 1px solid #444;
+            image-rendering: pixelated;
+        }
+        .no-img {
+            color: #777;
+            font-style: italic;
+        }
+        .details p {
+            margin: 4px 0;
+            font-size: 0.9em;
+        }
+        .section-title {
+            font-weight: bold;
+            color: #81d4fa;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+            border-bottom: 1px solid #333;
+        }
+        ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 0.85em;
+            color: #ccc;
+        }
+        code {
+            background: #333;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: #ff8a80;
+        }
+        .rule-tag {
+            color: #a5d6a7;
+        }
+    </style>
+</head>
+<body>
+    <h1>DTA Detection Audit Gallery — Method: <code>combat_base</code></h1>
+    <div class="summary-bar">
+        <div><strong>Total Candidates:</strong> 0</div>
+        <div><strong style="color:#66bb6a;">Accepted:</strong> 0</div>
+        <div><strong style="color:#ef5350;">Rejected:</strong> 0</div>
+    </div>
+    <div class="grid">
+        
+    </div>
+</body>
+</html>

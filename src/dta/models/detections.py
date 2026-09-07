@@ -38,6 +38,8 @@ class RawCharacterDetection(BaseModel):
     reason: str = "passed_filtering"
     crop_file: str | None = None
     lifecycle: list[dict[str, Any]] = Field(default_factory=list)
+    diagnostics: dict[str, Any] = Field(default_factory=dict)
+    triggered_rules: list[str] = Field(default_factory=list)
 
 
 class CharacterDetection(BaseModel):

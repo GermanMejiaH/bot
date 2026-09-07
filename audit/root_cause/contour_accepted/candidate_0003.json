@@ -1,0 +1,29 @@
+{
+  "candidate_id": 3,
+  "method": "contour",
+  "bbox": [
+    570,
+    320,
+    61,
+    61
+  ],
+  "accepted": true,
+  "area": 3721.0,
+  "aspect_ratio": 1.0,
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "diagnostics": {
+    "contour_area": 2834.0,
+    "bounding_rect_area": 3721.0,
+    "fill_ratio": 0.7616,
+    "edge_density": 0.0537
+  },
+  "frame_id": "audit_synth_0050"
+}

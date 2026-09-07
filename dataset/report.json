@@ -1,13 +1,13 @@
 {
-  "session_start_time": "2026-09-07T21:48:31.112200+00:00",
-  "session_end_time": "2026-09-07T21:50:29.709600+00:00",
-  "duration_seconds": 118.6,
+  "session_start_time": "2026-09-07T22:10:51.536883+00:00",
+  "session_end_time": "2026-09-07T22:10:59.840558+00:00",
+  "duration_seconds": 8.3,
   "metrics": {
-    "total_frames_seen": 85,
-    "total_frames_saved": 42,
-    "duplicate_frames_skipped": 1,
-    "combat_frames_saved": 25,
-    "exploration_frames_saved": 17,
-    "average_frame_difference": 0.0667
+    "total_frames_seen": 50,
+    "total_frames_saved": 1,
+    "duplicate_frames_skipped": 35,
+    "combat_frames_saved": 0,
+    "exploration_frames_saved": 1,
+    "average_frame_difference": 0.0278
   }
 }

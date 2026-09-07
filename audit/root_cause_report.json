@@ -1,0 +1,333 @@
+{
+  "summary": {
+    "total_frames_audited": 50,
+    "total_candidates": 500,
+    "accepted_candidates": 150,
+    "rejected_candidates": 350,
+    "average_entities_per_frame": 3.0,
+    "average_candidates_per_frame": 10.0,
+    "accepted_by_method": {
+      "contour": 50,
+      "hsv": 100,
+      "combat_base": 0
+    },
+    "rejected_by_method": {
+      "contour": 250,
+      "hsv": 100,
+      "combat_base": 0
+    },
+    "statistics_by_method": {
+      "contour": {
+        "total_count": 300,
+        "accepted_count": 50,
+        "rejected_count": 250,
+        "overall": {
+          "width": {
+            "min": 20.0,
+            "max": 61.0,
+            "mean": 46.833333333333336,
+            "median": 49.0,
+            "p25": 42.0,
+            "p75": 60.0,
+            "p95": 61.0
+          },
+          "height": {
+            "min": 61.0,
+            "max": 302.0,
+            "mean": 142.33333333333334,
+            "median": 98.0,
+            "p25": 93.0,
+            "p75": 202.0,
+            "p95": 302.0
+          },
+          "area": {
+            "min": 1860.0,
+            "max": 18120.0,
+            "mean": 6955.5,
+            "median": 4774.0,
+            "p25": 3721.0,
+            "p75": 8484.0,
+            "p95": 18120.0
+          },
+          "aspect_ratio": {
+            "min": 1.0,
+            "max": 5.033333333333333,
+            "mean": 3.2666666666666666,
+            "median": 3.5392857142857146,
+            "p25": 1.6785714285714286,
+            "p75": 4.809523809523809,
+            "p95": 5.033333333333333
+          }
+        },
+        "accepted": {
+          "width": {
+            "min": 61.0,
+            "max": 61.0,
+            "mean": 61.0,
+            "median": 61.0,
+            "p25": 61.0,
+            "p75": 61.0,
+            "p95": 61.0
+          },
+          "height": {
+            "min": 61.0,
+            "max": 61.0,
+            "mean": 61.0,
+            "median": 61.0,
+            "p25": 61.0,
+            "p75": 61.0,
+            "p95": 61.0
+          },
+          "area": {
+            "min": 3721.0,
+            "max": 3721.0,
+            "mean": 3721.0,
+            "median": 3721.0,
+            "p25": 3721.0,
+            "p75": 3721.0,
+            "p95": 3721.0
+          },
+          "aspect_ratio": {
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "median": 1.0,
+            "p25": 1.0,
+            "p75": 1.0,
+            "p95": 1.0
+          }
+        }
+      },
+      "hsv": {
+        "total_count": 200,
+        "accepted_count": 100,
+        "rejected_count": 100,
+        "overall": {
+          "width": {
+            "min": 19.0,
+            "max": 59.0,
+            "mean": 43.5,
+            "median": 48.0,
+            "p25": 35.5,
+            "p75": 56.0,
+            "p95": 59.0
+          },
+          "height": {
+            "min": 92.0,
+            "max": 301.0,
+            "mean": 146.75,
+            "median": 97.0,
+            "p25": 92.75,
+            "p75": 151.0,
+            "p95": 301.0
+          },
+          "area": {
+            "min": 1748.0,
+            "max": 17759.0,
+            "mean": 7190.75,
+            "median": 4628.0,
+            "p25": 3542.75,
+            "p75": 8276.0,
+            "p95": 17759.0
+          },
+          "aspect_ratio": {
+            "min": 1.690909090909091,
+            "max": 5.101694915254237,
+            "mean": 3.524530975866891,
+            "median": 3.6527599486521183,
+            "p25": 2.270288248337029,
+            "p75": 4.90700267618198,
+            "p95": 5.101694915254237
+          }
+        },
+        "accepted": {
+          "width": {
+            "min": 41.0,
+            "max": 55.0,
+            "mean": 48.0,
+            "median": 48.0,
+            "p25": 41.0,
+            "p75": 55.0,
+            "p95": 55.0
+          },
+          "height": {
+            "min": 93.0,
+            "max": 101.0,
+            "mean": 97.0,
+            "median": 97.0,
+            "p25": 93.0,
+            "p75": 101.0,
+            "p95": 101.0
+          },
+          "area": {
+            "min": 4141.0,
+            "max": 5115.0,
+            "mean": 4628.0,
+            "median": 4628.0,
+            "p25": 4141.0,
+            "p75": 5115.0,
+            "p95": 5115.0
+          },
+          "aspect_ratio": {
+            "min": 1.690909090909091,
+            "max": 2.4634146341463414,
+            "mean": 2.0771618625277166,
+            "median": 2.077161862527716,
+            "p25": 1.690909090909091,
+            "p75": 2.4634146341463414,
+            "p95": 2.4634146341463414
+          }
+        }
+      },
+      "combat_base": {
+        "total_count": 0,
+        "accepted_count": 0,
+        "rejected_count": 0,
+        "overall": {
+          "width": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "height": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "area": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "aspect_ratio": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          }
+        },
+        "accepted": {
+          "width": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "height": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "area": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          },
+          "aspect_ratio": {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 0.0,
+            "p95": 0.0
+          }
+        }
+      }
+    }
+  },
+  "forensic_questions": {
+    "q1_trees": {
+      "question": "Why are trees being accepted?",
+      "root_cause_finding": "Trees produce vertical bark texture edges that pass Canny edge detection (30,90) and morph closing (3,7), generating candidate bounding boxes. In contour method, `_filter_box_with_reason` accepts fill ratios as low as 0.05 (5%). Tree trunks have high height (h=40-120) and narrow width (w=15-40), yielding aspect ratio 1.5-3.0 and bbox area 600-4000 px\u00b2, which fall inside the overly permissive filter ranges (w in [12,95], h in [16,160], area in [200,12000], aspect ratio in [0.5,3.5]).",
+      "triggered_rules": [
+        "canny_edge_extract",
+        "min_max_width_pass",
+        "min_max_height_pass",
+        "min_max_area_pass",
+        "aspect_ratio_pass",
+        "contour_fill_ratio_pass",
+        "nms_survived"
+      ]
+    },
+    "q2_roofs": {
+      "question": "Why are roofs being accepted?",
+      "root_cause_finding": "Roof edges and building gables contain high contrast color/saturation shifts. In HSV detection, roof tiles pass HSV lower/upper range (S>=15, V>=20). After morph closing, roof contours form large horizontal boxes. When bounding box dimensions satisfy width (12-95) and height (16-160) and area < 12000, they pass filtering because no roof roof-line geometric slope filter exists.",
+      "triggered_rules": [
+        "hsv_segmentation_pass",
+        "green_tile_exclusion_pass",
+        "min_max_width_pass",
+        "min_max_height_pass",
+        "min_max_area_pass",
+        "aspect_ratio_pass",
+        "contour_fill_ratio_pass",
+        "nms_survived"
+      ]
+    },
+    "q3_flowers": {
+      "question": "Why are flowers being accepted?",
+      "root_cause_finding": "Red/magenta/blue flower patches and scenery flora match HSV ring masks in `detect_combat_bases` (red: H in [0..12] or [165..180], blue: H in [85..135]). Small flower clusters yield bounding boxes w in [14..85], h in [8..50], aspect in [0.22..0.95]. If background scenery foliage above the flower contains minor edge texture (edge_density >= 0.035), the detector misidentifies the flower as an isometric base ring under a character's feet and expands its height to sprite_h = max(h*4.8, w*2.4).",
+      "triggered_rules": [
+        "hsv_color_ring_pass",
+        "dim_aspect_ratio_pass",
+        "fill_sat_val_pass",
+        "sprite_edge_density_pass",
+        "nms_survived"
+      ]
+    },
+    "q4_movement_cells": {
+      "question": "Why are movement cells being accepted?",
+      "root_cause_finding": "Tactical combat movement cells (blue/white/red highlight borders on ground tiles) match combat ring HSV bounds. Although green PM tiles are excluded via `green_tile_mask`, red/blue combat tile borders pass ring masks. If fill_ratio >= 0.42 and edge_density >= 0.035 in the cell area above, cell highlights pass filtering and trigger height expansion into false entity bboxes.",
+      "triggered_rules": [
+        "hsv_color_ring_pass",
+        "dim_aspect_ratio_pass",
+        "fill_sat_val_pass",
+        "sprite_edge_density_pass",
+        "nms_survived"
+      ]
+    },
+    "q5_player_missed": {
+      "question": "Why is the player missed in exploration?",
+      "root_cause_finding": "Exploration characters do NOT have combat base rings beneath their feet (detect_combat_bases yields 0 candidates). The player relies on contour/HSV detection (conf 0.85/0.88). If the player stands near complex scenery or map ROI borders, the character contour merges with background edges or gets suppressed during NMS by adjacent high-area scenery candidate boxes.",
+      "rejection_stage": "nms_suppression_or_roi_clipping"
+    },
+    "q6_mobs_missed": {
+      "question": "Why are mobs missed in exploration?",
+      "root_cause_finding": "Exploration mob sprites vary wildly in shape (wide/short creatures have aspect ratio < 0.50; tiny creatures have area < 200 px\u00b2 or width < 12 px). `_filter_box_with_reason` strictly rejects candidates with aspect ratio < 0.50 (e.g. `failed_aspect_ratio`) or area < 200, discarding non-standard mob sprites before NMS.",
+      "rejection_stage": "filtering (_filter_box_with_reason)"
+    },
+    "q7_oversized_bboxes": {
+      "question": "Why are combat bounding boxes oversized?",
+      "root_cause_finding": "In `detect_combat_bases`, when a base ring (w, h) is detected, the detector applies fixed heuristic height expansion: `sprite_h = max(int(h * 4.8), int(w * 2.4))`. For a small ring (w=38, h=20), `sprite_h` expands to 124 px height regardless of the actual character sprite height. Small pets, summons, or short characters receive full 124 px vertical bboxes, causing giant empty vertical margins and IoU overlap with neighboring units.",
+      "triggered_rules": [
+        "combat_base_height_expansion_formula"
+      ]
+    }
+  }
+}

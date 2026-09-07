@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-09-07T22:15:50.228451+00:00",
+  "frame_id": "audit_0110",
+  "combat": false,
+  "resolution": [
+    1218,
+    672
+  ],
+  "pa": null,
+  "pm": null,
+  "hp": null,
+  "detected_entities": 6,
+  "phash": "02dfd3dfebcbcea6",
+  "frame_difference": 0.0144
+}

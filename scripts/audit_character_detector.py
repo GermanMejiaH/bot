@@ -80,10 +80,22 @@ def run_audit(
         for i in range(frames_count):
             # Create synthetic test frame simulating exploration screen with map edges & HUD
             synth_frame = np.zeros((720, 1280, 3), dtype=np.uint8)
-            # Add subtle scenery textures
+            # Add synthetic test shapes triggering combat_base, HSV, and contour methods for complete audit trace
             cv2.rectangle(synth_frame, (100, 150), (250, 450), (45, 80, 120), -1)
             cv2.rectangle(synth_frame, (300, 200), (340, 400), (80, 120, 40), -1)
             cv2.circle(synth_frame, (600, 350), 30, (200, 200, 200), -1)
+            # Red combat base ring (H in [0..12], S>=85, V>=85) with sprite body above
+            cv2.ellipse(synth_frame, (400, 600), (25, 10), 0, 0, 360, (20, 20, 220), 4)
+            cv2.rectangle(synth_frame, (385, 520), (415, 595), (100, 120, 150), -1)
+            cv2.line(synth_frame, (385, 530), (415, 580), (255, 255, 255), 2)
+            cv2.line(synth_frame, (385, 560), (415, 540), (0, 0, 0), 2)
+            # Blue combat base ring (H in [85..135], S>=40, V>=70) with sprite body above
+            cv2.ellipse(synth_frame, (700, 500), (25, 10), 0, 0, 360, (220, 120, 20), 4)
+            cv2.rectangle(synth_frame, (685, 420), (715, 495), (120, 100, 150), -1)
+            cv2.line(synth_frame, (685, 430), (715, 480), (255, 255, 255), 2)
+            cv2.line(synth_frame, (685, 460), (715, 440), (0, 0, 0), 2)
+            # HSV character region
+            cv2.rectangle(synth_frame, (520, 280), (560, 380), (30, 180, 200), -1)
 
             meta = FrameMetadata(
                 frame_id=f"audit_synth_{i+1:04d}",
