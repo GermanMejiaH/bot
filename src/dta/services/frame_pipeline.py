@@ -141,9 +141,27 @@ class FramePipeline:
             if self._frame_count % 30 == 1:
                 self.map_roi_extractor.save_roi_frame(roi_frame, frame_id)
 
-            raw_characters = self.character_detector.detect_characters(roi_frame)
+            if hasattr(self.character_detector, "detect_characters_with_trace"):
+                trace_res = self.character_detector.detect_characters_with_trace(roi_frame)
+                if isinstance(trace_res, dict):
+                    raw_characters = trace_res.get("raw_characters", [])
+                    rejected_characters = trace_res.get("rejected_characters", [])
+                    all_candidates = trace_res.get("all_candidates", [])
+                    stage_masks = trace_res.get("stage_masks", {})
+                    statistics = trace_res.get("statistics", {})
+                else:
+                    raw_characters = self.character_detector.detect_characters(roi_frame)
+                    rejected_characters = []
+                    all_candidates = raw_characters
+                    stage_masks = {}
+                    statistics = {}
+            else:
+                raw_characters = self.character_detector.detect_characters(roi_frame)
+                rejected_characters = []
+                all_candidates = raw_characters
+                stage_masks = {}
+                statistics = {}
             t_det_end = time.perf_counter()
-
 
             # Step 3: Entity Tracking
             t_track_start = time.perf_counter()
@@ -156,8 +174,22 @@ class FramePipeline:
                 frame_id=frame_id,
                 timestamp=now_wall,
                 raw_characters=raw_characters,
+                rejected_characters=rejected_characters,
+                all_candidates=all_candidates,
                 resources=resources,
+                debug_masks=stage_masks,
+                statistics=statistics,
             )
+
+            # Auto-save validation overlay if configured
+            if self.settings.debug.save_detection_overlays:
+                try:
+                    from dta.debug.detection_visualizer import save_detection_overlay
+
+                    val_path = f"{self.settings.debug.output_dir}/overlay_{frame_id}.png"
+                    save_detection_overlay(frame_img, raw_characters, output_path=val_path)
+                except Exception as val_exc:
+                    logger.debug(f"Failed saving validation overlay: {val_exc}")
 
             game_state = self.state_builder.build_game_state(
                 frame_id=frame_id,

@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from dta.config.settings import Settings
 from dta.events.event_bus import EventBus
 from dta.events.events import GameStateUpdated
+from dta.models.combat import CombatState
 from dta.models.detections import ResourceDetection
 from dta.models.game_state import GameState
 from dta.models.perception_state import PerceptionState
@@ -77,12 +78,14 @@ def test_dataset_capture_combat_classification() -> None:
         )
         g_state_exp = GameState(frame_id="frame_exp_001", perception_state=p_state_exp)
 
-        # 2. Combat GameState (PA=11, PM=6)
+        from dta.models.combat import CombatState
+
+        # 2. Combat GameState (Turn Banner Active)
         p_state_combat = PerceptionState(
             frame_id="frame_combat_001",
             resources=ResourceDetection(pa=11, pm=6, hp=5000),
         )
-        g_state_combat = GameState(frame_id="frame_combat_001", perception_state=p_state_combat)
+        g_state_combat = GameState(frame_id="frame_combat_001", perception_state=p_state_combat, combat_state=CombatState())
 
         assert not service.is_combat_active(g_state_exp)
         assert service.is_combat_active(g_state_combat)
@@ -93,6 +96,8 @@ def test_dataset_capture_combat_classification() -> None:
 def test_dataset_capture_frame_saving_and_metadata() -> None:
     temp_dir = tempfile.mkdtemp()
     try:
+        from dta.models.combat import CombatState
+
         settings = Settings()
         settings.dataset.save_interval_seconds = 0.0
         settings.dataset.min_frame_difference = 0.01
@@ -106,7 +111,7 @@ def test_dataset_capture_frame_saving_and_metadata() -> None:
             frame_id="frame_001",
             resources=ResourceDetection(pa=11, pm=6, hp=5279),
         )
-        g_state = GameState(frame_id="frame_001", perception_state=p_state, frame_image=img)
+        g_state = GameState(frame_id="frame_001", perception_state=p_state, combat_state=CombatState(), frame_image=img)
 
         res = service.capture_frame(g_state)
         assert res is not None
@@ -136,6 +141,7 @@ def test_dataset_capture_frame_saving_and_metadata() -> None:
 def test_dataset_capture_deduplication_skipping() -> None:
     temp_dir = tempfile.mkdtemp()
     try:
+
         settings = Settings()
         settings.dataset.save_interval_seconds = 0.0
         settings.dataset.min_frame_difference = 0.05
@@ -178,11 +184,11 @@ def test_dataset_capture_metrics_and_report_generation() -> None:
 
         # Frame 1: Combat (Saved)
         p_combat = PerceptionState(frame_id="f1", resources=ResourceDetection(pa=11, pm=6))
-        g1 = GameState(frame_id="f1", perception_state=p_combat, frame_image=img1)
+        g1 = GameState(frame_id="f1", perception_state=p_combat, combat_state=CombatState(), frame_image=img1)
         service.capture_frame(g1)
 
         # Frame 2: Identical (Duplicate Skipped)
-        g2 = GameState(frame_id="f2", perception_state=p_combat, frame_image=img1)
+        g2 = GameState(frame_id="f2", perception_state=p_combat, combat_state=CombatState(), frame_image=img1)
         service.capture_frame(g2)
 
         # Frame 3: Exploration Distinct (Saved)

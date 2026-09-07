@@ -51,6 +51,14 @@ class DebugSettings(BaseModel):
     output_dir: str = "debug_captures/validation"
 
 
+class AuditSettings(BaseModel):
+    """Audit mode configuration."""
+
+    enabled: bool = True
+    max_frames: int = 50
+    output_dir: str = "audit"
+
+
 class Settings(BaseSettings):
     """Main application settings loaded from config.yaml or defaults."""
 
@@ -61,6 +69,7 @@ class Settings(BaseSettings):
     ocr_update_interval: float = 0.25
     debug_mode: bool = True
     debug: DebugSettings = Field(default_factory=DebugSettings)
+    audit: AuditSettings = Field(default_factory=AuditSettings)
 
     supported_resolutions: list[str] = Field(default_factory=lambda: ["1920x1080", "1366x768"])
     ui_scale: str = "auto"

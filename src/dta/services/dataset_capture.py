@@ -54,6 +54,21 @@ class DatasetCaptureService:
         self.exploration_dir = os.path.join(self.dataset_dir, "exploration")
         self.validation_dir = os.path.join(self.dataset_dir, "validation")
 
+        # Audit Mode Configuration
+        audit_config = self.settings.audit
+        self.audit_enabled = audit_config.enabled
+        self.audit_max_frames = audit_config.max_frames
+        self.audit_dir = audit_config.output_dir
+        self.audit_original_dir = os.path.join(self.audit_dir, "original")
+        self.audit_overlay_dir = os.path.join(self.audit_dir, "overlay")
+        self.audit_stages_dir = os.path.join(self.audit_dir, "stages")
+        self.audit_crops_dir = os.path.join(self.audit_dir, "crops")
+        self.audit_excluded_dir = os.path.join(self.audit_dir, "excluded_regions")
+        self.audit_json_path = os.path.join(self.audit_dir, "detections.json")
+
+        self._audit_frame_count: int = 0
+        self._audit_records: list[dict[str, Any]] = []
+
         self._ensure_directories()
 
         self._session_start_time: float = time.time()
@@ -73,10 +88,20 @@ class DatasetCaptureService:
 
     def _ensure_directories(self) -> None:
         """Create dataset target directory structure if missing."""
-        for d in [self.dataset_dir, self.raw_dir, self.combat_dir, self.exploration_dir, self.validation_dir]:
+        dirs = [self.dataset_dir, self.raw_dir, self.combat_dir, self.exploration_dir, self.validation_dir]
+        if self.audit_enabled:
+            dirs.extend([
+                self.audit_dir,
+                self.audit_original_dir,
+                self.audit_overlay_dir,
+                self.audit_stages_dir,
+                self.audit_crops_dir,
+                self.audit_excluded_dir,
+            ])
+        for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d, exist_ok=True)
-                logger.debug(f"Created dataset directory: {d}")
+                logger.debug(f"Created target directory: {d}")
 
     @property
     def captured_count(self) -> int:
@@ -175,31 +200,160 @@ class DatasetCaptureService:
         diff = float(np.mean(np.abs(r1 - r2))) / 255.0
         return diff
 
+    def get_combat_status_with_reason(self, game_state: GameState) -> tuple[bool, str, dict[str, Any]]:
+        """Determine combat state classification returning boolean, exact reason string, and details dict."""
+        from dta.services.combat_classifier import CombatClassifier
+
+        classifier = CombatClassifier()
+        evidence = classifier.evaluate(game_state)
+        return evidence.is_combat, evidence.reason, evidence.to_dict()
+
     def is_combat_active(self, game_state: GameState) -> bool:
         """Determine whether the GameState snapshot represents a combat session."""
-        if game_state.combat_state is not None:
-            return True
+        is_combat, _, _ = self.get_combat_status_with_reason(game_state)
+        return is_combat
+
+    def process_audit_frame(self, game_state: GameState) -> None:
+        """Process and save AUDIT mode trace data, crops, stage images, and structured JSON record."""
+        if not self.audit_enabled or self._audit_frame_count >= self.audit_max_frames:
+            return
+
+        frame_img = game_state.frame_image
+        if frame_img is None or frame_img.size == 0:
+            return
+
+        self._audit_frame_count += 1
+        fid = f"{self._audit_frame_count:04d}"
+
+        # 1. Original frame
+        orig_path = os.path.join(self.audit_original_dir, f"frame_{fid}.png")
+        cv2.imwrite(orig_path, frame_img)
 
         perc = game_state.perception_state
-        if perc is None:
-            return False
+        batch = perc.raw_detections if perc else None
+        res = perc.resources if perc else None
 
-        # Resource check (PA/PM > 0 in combat HUD)
-        res = perc.resources
-        if (res.pa is not None and res.pa > 0) or (res.pm is not None and res.pm > 0):
-            return True
+        from dta.services.combat_classifier import CombatClassifier
+        classifier = CombatClassifier()
+        evidence = classifier.evaluate(game_state)
+        is_combat = evidence.is_combat
+        combat_reason = evidence.reason
+        combat_details = evidence.to_dict()
 
-        # Check raw detections for combat base detection method
-        if perc.raw_detections:
-            for char_det in perc.raw_detections.raw_characters:
-                if char_det.method == "combat_base":
-                    return True
+        all_candidates = batch.all_candidates if batch else []
+        if not all_candidates and batch and batch.raw_characters:
+            all_candidates = batch.raw_characters
 
-        return False
+        # 2. Candidate Crops (both accepted and rejected)
+        candidate_records = []
+        for det in all_candidates:
+            cid = det.candidate_id if det.candidate_id is not None else 0
+            status_tag = "accepted" if det.accepted else "rejected"
+            crop_filename = f"entity_{cid:04d}_{status_tag}.png"
+            crop_path = os.path.join(self.audit_crops_dir, crop_filename)
+
+            bx, by, bw, bh = det.bbox.x, det.bbox.y, det.bbox.w, det.bbox.h
+            h, w = frame_img.shape[:2]
+            y1, y2 = max(0, by), min(h, by + bh)
+            x1, x2 = max(0, bx), min(w, bx + bw)
+
+            if (y2 - y1) > 0 and (x2 - x1) > 0:
+                crop_img = frame_img[y1:y2, x1:x2]
+                cv2.imwrite(crop_path, crop_img)
+            else:
+                crop_filename = "invalid_crop"
+
+            det.crop_file = crop_filename
+
+            candidate_records.append({
+                "candidate_id": cid,
+                "method": det.method,
+                "bbox": [det.bbox.x, det.bbox.y, det.bbox.w, det.bbox.h],
+                "centroid": list(det.centroid),
+                "area": det.area,
+                "confidence": det.confidence,
+                "accepted": det.accepted,
+                "reason": det.reason,
+                "crop_file": crop_filename,
+                "lifecycle": det.lifecycle,
+            })
+
+        # 3. Trace Overlay
+        from dta.debug.detection_visualizer import DetectionVisualizer
+        visualizer = DetectionVisualizer(settings=self.settings)
+        overlay_img = visualizer.draw_trace_overlay(frame_img, all_candidates)
+        overlay_path = os.path.join(self.audit_overlay_dir, f"frame_{fid}.png")
+        cv2.imwrite(overlay_path, overlay_img)
+
+        # 4. Stage Images
+        debug_masks = batch.debug_masks if batch else {}
+        contours_mask = debug_masks.get("closed_contours")
+        hsv_mask = debug_masks.get("hsv_mask")
+        ring_mask = debug_masks.get("ring_mask")
+
+        contours_stage_path = os.path.join(self.audit_stages_dir, f"frame_{fid}_contours.png")
+        hsv_stage_path = os.path.join(self.audit_stages_dir, f"frame_{fid}_hsv.png")
+        combat_bases_stage_path = os.path.join(self.audit_stages_dir, f"frame_{fid}_combat_bases.png")
+        final_stage_path = os.path.join(self.audit_stages_dir, f"frame_{fid}_final.png")
+
+        cv2.imwrite(contours_stage_path, contours_mask if contours_mask is not None else np.zeros_like(frame_img[:, :, 0]))
+        cv2.imwrite(hsv_stage_path, hsv_mask if hsv_mask is not None else np.zeros_like(frame_img[:, :, 0]))
+        cv2.imwrite(combat_bases_stage_path, ring_mask if ring_mask is not None else np.zeros_like(frame_img[:, :, 0]))
+        cv2.imwrite(final_stage_path, overlay_img)
+
+        # 5. Excluded ROI mask
+        from dta.vision.map_roi_extractor import MapROIExtractor
+        roi_extractor = MapROIExtractor(settings=self.settings)
+        roi_mask = roi_extractor.get_roi_mask(frame_img.shape)
+        roi_mask_path = os.path.join(self.audit_excluded_dir, f"frame_{fid}_roi_mask.png")
+        cv2.imwrite(roi_mask_path, roi_mask)
+
+        # 6. Structured Trace Record
+        stats = batch.statistics if batch else {}
+        entities_by_method = {
+            "contour": sum(1 for c in all_candidates if c.accepted and c.method == "contour"),
+            "hsv": sum(1 for c in all_candidates if c.accepted and c.method == "hsv"),
+            "combat_base": sum(1 for c in all_candidates if c.accepted and c.method == "combat_base"),
+        }
+
+        audit_record = {
+            "frame_id": game_state.frame_id,
+            "audit_sequence": self._audit_frame_count,
+            "timestamp": datetime.fromtimestamp(game_state.timestamp, tz=UTC).isoformat(),
+            "game_state": {
+                "combat": is_combat,
+                "combat_score": evidence.score,
+                "combat_threshold": evidence.combat_threshold,
+                "combat_reason": combat_reason,
+                "combat_evidence": combat_details,
+                "player_hp": res.hp if res else None,
+                "player_pa": res.pa if res else None,
+                "player_pm": res.pm if res else None,
+                "entities_count": len([c for c in all_candidates if c.accepted]),
+                "entities_by_method": entities_by_method,
+            },
+            "statistics": stats,
+            "candidates": candidate_records,
+        }
+
+        self._audit_records.append(audit_record)
+
+        with open(self.audit_json_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "total_frames_audited": len(self._audit_records),
+                "audit_timestamp": datetime.now(UTC).isoformat(),
+                "frames": self._audit_records,
+            }, f, indent=2)
+
+        logger.info(f"Saved AUDIT frame trace [{self._audit_frame_count}/{self.audit_max_frames}] -> {orig_path}")
 
     def capture_frame(self, game_state: GameState) -> dict[str, str] | None:
         """Process and conditionally save a GameState frame and metadata to the dataset directory structure."""
         with self._lock:
+            # Process audit trace first if audit mode enabled
+            if self.audit_enabled:
+                self.process_audit_frame(game_state)
+
             if not self.enabled:
                 return None
 

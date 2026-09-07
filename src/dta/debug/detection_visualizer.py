@@ -38,68 +38,98 @@ class DetectionVisualizer:
         """Return BGR color tuple corresponding to detection method."""
         return METHOD_COLORS.get(method.lower(), DEFAULT_COLOR)
 
+    def draw_trace_overlay(
+        self,
+        frame: np.ndarray,
+        candidates: list[RawCharacterDetection],
+    ) -> np.ndarray:
+        """Render candidate bounding boxes with candidate ID, method, confidence, status, and rejection reason."""
+        if frame is None or frame.size == 0:
+            return np.zeros((100, 100, 3), dtype=np.uint8)
+
+        overlay = frame.copy()
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.38
+        thickness = 1
+
+        for det in candidates:
+            bbox = det.bbox
+            cid_str = f"ID:{det.candidate_id}" if det.candidate_id is not None else "ID:?"
+            status_str = "ACCEPTED" if det.accepted else f"REJECTED: {det.reason}"
+
+            if det.accepted:
+                color = self.get_method_color(det.method)
+                line_thickness = 2
+            else:
+                color = (128, 128, 128)  # Gray for rejected
+                line_thickness = 1
+
+            # Bounding box
+            cv2.rectangle(
+                overlay,
+                (bbox.x, bbox.y),
+                (bbox.x + bbox.w, bbox.y + bbox.h),
+                color,
+                line_thickness,
+            )
+
+            # Centroid
+            cv2.circle(overlay, det.centroid, 3, (255, 255, 255), -1)
+            cv2.circle(overlay, det.centroid, 1, color, -1)
+
+            # Multi-line label lines
+            l1 = f"{cid_str} | {det.method}"
+            l2 = f"conf:{det.confidence:.2f} | {status_str}"
+            lines = [l1, l2]
+
+            # Determine background box dimensions
+            max_w = 0
+            total_h = 0
+            line_heights: list[int] = []
+
+            for line in lines:
+                (tw, th), baseline = cv2.getTextSize(line, font, font_scale, thickness)
+                max_w = max(max_w, tw)
+                line_heights.append(th + baseline + 2)
+                total_h += th + baseline + 2
+
+            text_x = bbox.x
+            text_y = max(total_h + 4, bbox.y - 4)
+
+            # Background rectangle for crisp text readability
+            cv2.rectangle(
+                overlay,
+                (text_x, text_y - total_h - 2),
+                (text_x + max_w + 6, text_y + 2),
+                (0, 0, 0),
+                -1,
+            )
+
+            curr_y = text_y - total_h + line_heights[0] - 2
+            for idx, line in enumerate(lines):
+                line_color = color if idx == 0 else ((0, 255, 0) if det.accepted else (0, 0, 255))
+                cv2.putText(
+                    overlay,
+                    line,
+                    (text_x + 3, curr_y),
+                    font,
+                    font_scale,
+                    line_color,
+                    thickness,
+                    cv2.LINE_AA,
+                )
+                if idx < len(lines) - 1:
+                    curr_y += line_heights[idx + 1]
+
+        return overlay
+
     def draw_detections(
         self,
         frame: np.ndarray,
         detections: list[RawCharacterDetection],
     ) -> np.ndarray:
         """Render colored bounding boxes, centroids, and method/confidence/area labels onto frame copy."""
-        if frame is None or frame.size == 0:
-            return np.zeros((100, 100, 3), dtype=np.uint8)
-
-        overlay = frame.copy()
-
-        for det in detections:
-            bbox = det.bbox
-            method = det.method
-            color = self.get_method_color(method)
-
-            # Draw bounding box rectangle
-            cv2.rectangle(
-                overlay,
-                (bbox.x, bbox.y),
-                (bbox.x + bbox.w, bbox.y + bbox.h),
-                color,
-                2,
-            )
-
-            # Draw centroid circle
-            cv2.circle(overlay, det.centroid, 4, (255, 255, 255), -1)
-            cv2.circle(overlay, det.centroid, 2, color, -1)
-
-            # Text Label: method | conf | area
-            label = f"{method} | conf:{det.confidence:.2f} | area:{det.area:.0f}"
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            font_scale = 0.4
-            thickness = 1
-
-            (text_w, text_h), baseline = cv2.getTextSize(label, font, font_scale, thickness)
-
-            # Position text above bbox, or inside top of bbox if near top edge
-            text_x = bbox.x
-            text_y = max(text_h + 4, bbox.y - 6)
-
-            # Background rectangle for crisp text readability
-            cv2.rectangle(
-                overlay,
-                (text_x, text_y - text_h - 2),
-                (text_x + text_w + 4, text_y + baseline),
-                (0, 0, 0),
-                -1,
-            )
-
-            cv2.putText(
-                overlay,
-                label,
-                (text_x + 2, text_y),
-                font,
-                font_scale,
-                color,
-                thickness,
-                cv2.LINE_AA,
-            )
-
-        return overlay
+        return self.draw_trace_overlay(frame, detections)
 
     def save_detection_overlay(
         self,
@@ -108,7 +138,7 @@ class DetectionVisualizer:
         output_path: str | None = None,
     ) -> str:
         """Render detection overlay and save result image to disk."""
-        overlay = self.draw_detections(frame, detections)
+        overlay = self.draw_trace_overlay(frame, detections)
 
         if output_path is None:
             ts_str = datetime.fromtimestamp(time.time(), tz=UTC).strftime("%Y%m%d_%H%M%S_%f")[:23]

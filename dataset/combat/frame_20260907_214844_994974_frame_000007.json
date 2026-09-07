@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-09-07T21:48:44.994974+00:00",
+  "frame_id": "frame_000007",
+  "combat": true,
+  "resolution": [
+    1262,
+    935
+  ],
+  "pa": 11,
+  "pm": 6,
+  "hp": 5327,
+  "detected_entities": 23,
+  "phash": "89c76230f9329b39",
+  "frame_difference": 0.0126
+}

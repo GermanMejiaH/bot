@@ -33,6 +33,11 @@ class RawCharacterDetection(BaseModel):
     area: float
     confidence: float = 1.0
     method: str = "contour"
+    candidate_id: int | None = None
+    accepted: bool = True
+    reason: str = "passed_filtering"
+    crop_file: str | None = None
+    lifecycle: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class CharacterDetection(BaseModel):
@@ -59,10 +64,13 @@ class DetectionBatch(BaseModel):
     frame_id: str
     timestamp: float = Field(default_factory=time.time)
     raw_characters: list[RawCharacterDetection] = Field(default_factory=list)
+    rejected_characters: list[RawCharacterDetection] = Field(default_factory=list)
+    all_candidates: list[RawCharacterDetection] = Field(default_factory=list)
     characters: list[CharacterDetection] = Field(default_factory=list)
     resources: ResourceDetection = Field(default_factory=ResourceDetection)
     extra_detections: dict[str, Any] = Field(default_factory=dict)
     debug_masks: dict[str, Any] = Field(default_factory=dict)
     debug_overlay: Any | None = None
+    statistics: dict[str, int] = Field(default_factory=dict)
 
     model_config = {"arbitrary_types_allowed": True}

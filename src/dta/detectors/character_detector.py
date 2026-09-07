@@ -34,20 +34,25 @@ class CharacterDetector:
         self.max_aspect_ratio = max_aspect_ratio
         self.iou_threshold = iou_threshold
 
-    def _filter_box(self, w: int, h: int, bbox_area: float, cnt_area: float) -> bool:
-        """Validate candidate bounding box dimensions and fill ratio."""
+    def _filter_box_with_reason(self, w: int, h: int, bbox_area: float, cnt_area: float) -> tuple[bool, str]:
+        """Validate candidate bounding box dimensions and fill ratio returning pass status and reason string."""
         aspect_ratio = h / float(w) if w > 0 else 0.0
         if not (self.min_width <= w <= self.max_width):
-            return False
+            return False, f"failed_width ({w} not in [{self.min_width}, {self.max_width}])"
         if not (self.min_height <= h <= self.max_height):
-            return False
+            return False, f"failed_height ({h} not in [{self.min_height}, {self.max_height}])"
         if not (self.min_area <= bbox_area <= self.max_area):
-            return False
+            return False, f"failed_area ({bbox_area:.0f} not in [{self.min_area}, {self.max_area}])"
         if not (self.min_aspect_ratio <= aspect_ratio <= self.max_aspect_ratio):
-            return False
+            return False, f"failed_aspect_ratio ({aspect_ratio:.2f} not in [{self.min_aspect_ratio}, {self.max_aspect_ratio}])"
         if bbox_area > 0 and (cnt_area / bbox_area) < 0.05:
-            return False
-        return True
+            return False, f"failed_contour_fill_ratio ({cnt_area/bbox_area:.3f} < 0.05)"
+        return True, "passed_filtering"
+
+    def _filter_box(self, w: int, h: int, bbox_area: float, cnt_area: float) -> bool:
+        """Validate candidate bounding box dimensions and fill ratio."""
+        passed, _ = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+        return passed
 
     def detect_contours(self, frame: np.ndarray) -> list[RawCharacterDetection]:
         """Detect candidate character bounding boxes using image gradients and vertical morphology."""
@@ -281,6 +286,280 @@ class CharacterDetector:
         """Run Dofus-specific character detection pipeline combining contour, HSV, and combat base features."""
         candidates = self.detect_contours(frame) + self.detect_hsv_regions(frame) + self.detect_combat_bases(frame)
         return self.merge_candidates(candidates)
+
+    def detect_characters_with_trace(
+        self,
+        frame: np.ndarray,
+    ) -> dict[str, Any]:
+        """Run perception pipeline with end-to-end trace telemetry, candidate lifecycle tracking, and stage masks."""
+        if frame is None or frame.size == 0:
+            return {
+                "raw_characters": [],
+                "rejected_characters": [],
+                "all_candidates": [],
+                "stage_masks": {},
+                "statistics": {
+                    "raw_contours": 0,
+                    "raw_hsv": 0,
+                    "raw_combat_bases": 0,
+                    "after_filtering": 0,
+                    "after_nms": 0,
+                    "final_entities": 0,
+                },
+            }
+
+        candidate_counter = 1
+        all_candidates: list[RawCharacterDetection] = []
+
+        # --- STAGE 1: CONTOUR DETECTION ---
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
+        blurred = cv2.GaussianBlur(gray, (3, 3), 0)
+        edges = cv2.Canny(blurred, 30, 90)
+        kernel_vert = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 7))
+        closed_contours = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel_vert)
+        contours, _ = cv2.findContours(closed_contours, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        contour_accepted: list[RawCharacterDetection] = []
+        raw_contours_count = len(contours)
+
+        for cnt in contours:
+            cnt_area = float(cv2.contourArea(cnt))
+            x, y, w, h = cv2.boundingRect(cnt)
+            bbox_area = float(w * h)
+            bbox = BoundingBox(x=x, y=y, w=w, h=h)
+
+            cid = candidate_counter
+            candidate_counter += 1
+
+            passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            lifecycle = [
+                {"stage": "contour_detection", "accepted": True, "reason": "contour_extracted"},
+                {"stage": "filtering", "accepted": passed, "reason": filter_reason},
+            ]
+
+            det = RawCharacterDetection(
+                bbox=bbox,
+                centroid=bbox.centroid,
+                area=bbox_area,
+                confidence=0.85,
+                method="contour",
+                candidate_id=cid,
+                accepted=passed,
+                reason=filter_reason,
+                lifecycle=lifecycle,
+            )
+            all_candidates.append(det)
+            if passed:
+                contour_accepted.append(det)
+
+        # --- STAGE 2: HSV SEGMENTATION ---
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV) if len(frame.shape) == 3 else frame
+        hsv_mask = cv2.inRange(hsv, np.array([0, 15, 20]), np.array([180, 255, 255]))
+        green_tile_mask = cv2.inRange(hsv, np.array([35, 60, 60]), np.array([85, 255, 255]))
+        hsv_mask = cv2.bitwise_and(hsv_mask, cv2.bitwise_not(green_tile_mask))
+        closed_hsv = cv2.morphologyEx(hsv_mask, cv2.MORPH_CLOSE, kernel_vert)
+        hsv_contours, _ = cv2.findContours(closed_hsv, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        hsv_accepted: list[RawCharacterDetection] = []
+        raw_hsv_count = len(hsv_contours)
+
+        for cnt in hsv_contours:
+            cnt_area = float(cv2.contourArea(cnt))
+            x, y, w, h = cv2.boundingRect(cnt)
+            bbox_area = float(w * h)
+            bbox = BoundingBox(x=x, y=y, w=w, h=h)
+
+            cid = candidate_counter
+            candidate_counter += 1
+
+            passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            lifecycle = [
+                {"stage": "hsv_detection", "accepted": True, "reason": "hsv_segmented"},
+                {"stage": "filtering", "accepted": passed, "reason": filter_reason},
+            ]
+
+            det = RawCharacterDetection(
+                bbox=bbox,
+                centroid=bbox.centroid,
+                area=bbox_area,
+                confidence=0.88,
+                method="hsv",
+                candidate_id=cid,
+                accepted=passed,
+                reason=filter_reason,
+                lifecycle=lifecycle,
+            )
+            all_candidates.append(det)
+            if passed:
+                hsv_accepted.append(det)
+
+        # --- STAGE 3: COMBAT BASE RINGS ---
+        r1 = cv2.inRange(hsv, np.array([0, 85, 85]), np.array([12, 255, 255]))
+        r2 = cv2.inRange(hsv, np.array([165, 85, 85]), np.array([180, 255, 255]))
+        red_ring = cv2.bitwise_or(r1, r2)
+        blue_ring = cv2.inRange(hsv, np.array([85, 40, 70]), np.array([135, 255, 255]))
+        white_corners = cv2.inRange(hsv, np.array([0, 0, 180]), np.array([180, 60, 255]))
+        dilated_blue = cv2.dilate(blue_ring, cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
+        valid_white_corners = cv2.bitwise_and(white_corners, dilated_blue)
+        blue_with_corners = cv2.bitwise_or(blue_ring, valid_white_corners)
+
+        kernel_horiz = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 5))
+        closed_blue = cv2.morphologyEx(blue_with_corners, cv2.MORPH_CLOSE, kernel_horiz)
+        closed_red = cv2.morphologyEx(red_ring, cv2.MORPH_CLOSE, kernel_horiz)
+        ring_mask = cv2.bitwise_or(closed_red, closed_blue)
+
+        base_contours, _ = cv2.findContours(ring_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        raw_combat_bases_count = len(base_contours)
+
+        base_candidates: list[dict[str, Any]] = []
+        for cnt in base_contours:
+            x, y, w, h = cv2.boundingRect(cnt)
+            aspect = h / float(w) if w > 0 else 0.0
+            if 14 <= w <= 85 and 8 <= h <= 50 and 0.22 <= aspect <= 0.95:
+                crop_mask = ring_mask[y : y + h, x : x + w]
+                fill_ratio = np.count_nonzero(crop_mask) / float(w * h) if (w * h) > 0 else 1.0
+
+                if fill_ratio >= 0.42:
+                    body_hsv = hsv[max(0, y - int(h * 1.8)) : y, x : x + w]
+                    sat_std = float(np.std(body_hsv[:, :, 1])) if body_hsv.size > 0 else 0.0
+                    val_std = float(np.std(body_hsv[:, :, 2])) if body_hsv.size > 0 else 0.0
+                    if sat_std < 32.0 and val_std < 30.0:
+                        continue
+
+                body_y1 = max(0, y - int(h * 1.8))
+                body_y2 = y
+                sprite_region = edges[body_y1:body_y2, x : x + w]
+                edge_density = (
+                    np.count_nonzero(sprite_region) / float(w * (body_y2 - body_y1))
+                    if (body_y2 - body_y1) > 0
+                    else 0.0
+                )
+
+                if edge_density < 0.035:
+                    continue
+
+                blue_crop = closed_blue[y : y + h, x : x + w]
+                has_blue = bool(np.count_nonzero(blue_crop) > 10)
+
+                base_candidates.append({
+                    "bbox": [x, y, w, h],
+                    "cx": x + w / 2.0,
+                    "cy": y + h / 2.0,
+                    "fill_ratio": fill_ratio,
+                    "has_blue": has_blue,
+                })
+
+        filtered_base_candidates: list[dict[str, Any]] = []
+        for c in base_candidates:
+            if c["fill_ratio"] >= 0.42 and not c["has_blue"]:
+                near_blue = any(
+                    b["has_blue"] and np.hypot(c["cx"] - b["cx"], c["cy"] - b["cy"]) < 45.0
+                    for b in base_candidates
+                )
+                if near_blue:
+                    continue
+            filtered_base_candidates.append(c)
+
+        base_boxes: list[list[int]] = [c["bbox"] for c in filtered_base_candidates]
+        scores: list[float] = [0.92] * len(base_boxes)
+
+        indices = cv2.dnn.NMSBoxes(
+            bboxes=base_boxes,
+            scores=scores,
+            score_threshold=0.3,
+            nms_threshold=0.30,
+        )
+
+        combat_base_accepted: list[RawCharacterDetection] = []
+        if len(indices) > 0:
+            flat_indices = indices.flatten() if hasattr(indices, "flatten") else list(indices)
+            for idx in flat_indices:
+                x, y, w, h = base_boxes[int(idx)]
+                bottom_y = y + h
+                sprite_h = max(int(h * 4.8), int(w * 2.4))
+                char_y = max(0, bottom_y - sprite_h)
+                bbox_area = float(w * sprite_h)
+                bbox = BoundingBox(x=x, y=char_y, w=w, h=sprite_h)
+
+                cid = candidate_counter
+                candidate_counter += 1
+
+                lifecycle = [
+                    {"stage": "combat_base_detection", "accepted": True, "reason": "ring_base_extracted"},
+                    {"stage": "filtering", "accepted": True, "reason": "passed_filtering"},
+                ]
+
+                det = RawCharacterDetection(
+                    bbox=bbox,
+                    centroid=bbox.centroid,
+                    area=bbox_area,
+                    confidence=0.92,
+                    method="combat_base",
+                    candidate_id=cid,
+                    accepted=True,
+                    reason="passed_filtering",
+                    lifecycle=lifecycle,
+                )
+                all_candidates.append(det)
+                combat_base_accepted.append(det)
+
+        candidates_passed_filtering = contour_accepted + hsv_accepted + combat_base_accepted
+        after_filtering_count = len(candidates_passed_filtering)
+
+        # --- STAGE 4: NON-MAXIMUM SUPPRESSION (NMS) ---
+        merged_accepted: list[RawCharacterDetection] = []
+        if candidates_passed_filtering:
+            nms_scores = np.array([d.confidence for d in candidates_passed_filtering])
+            nms_indices = cv2.dnn.NMSBoxes(
+                bboxes=[[d.bbox.x, d.bbox.y, d.bbox.w, d.bbox.h] for d in candidates_passed_filtering],
+                scores=nms_scores.tolist(),
+                score_threshold=0.3,
+                nms_threshold=self.iou_threshold,
+            )
+
+            kept_set: set[int] = set()
+            if len(nms_indices) > 0:
+                flat_idx = nms_indices.flatten() if hasattr(nms_indices, "flatten") else list(nms_indices)
+                kept_set = {int(i) for i in flat_idx}
+
+            for idx, candidate in enumerate(candidates_passed_filtering):
+                if idx in kept_set:
+                    candidate.lifecycle.append({"stage": "nms", "accepted": True, "reason": "retained_by_nms"})
+                    candidate.lifecycle.append({"stage": "final_selection", "accepted": True, "reason": "final_selected"})
+                    candidate.accepted = True
+                    candidate.reason = "final_selected"
+                    merged_accepted.append(candidate)
+                else:
+                    candidate.lifecycle.append({"stage": "nms", "accepted": False, "reason": "suppressed_by_nms"})
+                    candidate.lifecycle.append({"stage": "final_selection", "accepted": False, "reason": "suppressed_by_nms"})
+                    candidate.accepted = False
+                    candidate.reason = "suppressed_by_nms"
+
+        after_nms_count = len(merged_accepted)
+        rejected_candidates = [c for c in all_candidates if not c.accepted]
+
+        stage_masks = {
+            "closed_contours": closed_contours,
+            "hsv_mask": closed_hsv,
+            "ring_mask": ring_mask,
+        }
+
+        statistics = {
+            "raw_contours": raw_contours_count,
+            "raw_hsv": raw_hsv_count,
+            "raw_combat_bases": raw_combat_bases_count,
+            "after_filtering": after_filtering_count,
+            "after_nms": after_nms_count,
+            "final_entities": len(merged_accepted),
+        }
+
+        return {
+            "raw_characters": merged_accepted,
+            "rejected_characters": rejected_candidates,
+            "all_candidates": all_candidates,
+            "stage_masks": stage_masks,
+            "statistics": statistics,
+        }
 
     def generate_debug_overlay(
         self,

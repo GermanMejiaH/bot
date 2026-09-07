@@ -14,6 +14,8 @@ debug:
 
 supported_resolutions:
   - "1920x1080"
+  - "1600x900"
+  - "1280x720"
   - "1366x768"
 
 ui_scale: "auto"
@@ -44,6 +46,6 @@ dataset:
   enabled: true
   save_interval_seconds: 2.0
   max_images_per_session: 5000
-  min_frame_difference: 0.05
+  min_frame_difference: 0.01
   dataset_dir: "dataset"
   save_raw: true
