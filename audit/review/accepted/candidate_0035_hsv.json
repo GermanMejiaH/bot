@@ -1,0 +1,48 @@
+{
+  "candidate_id": 35,
+  "method": "hsv",
+  "bbox": [
+    1082,
+    226,
+    20,
+    30
+  ],
+  "area": 600.0,
+  "taxonomy_class": "decoration",
+  "severity": "Minor FP",
+  "diagnostics": {
+    "mask_pixels": 331,
+    "mask_ratio": 0.5517,
+    "dominant_hue": 0,
+    "contour_area": 294.0,
+    "fill_ratio": 0.49,
+    "bbox_width": 20,
+    "bbox_height": 30,
+    "bbox_area": 600.0,
+    "aspect_ratio": 1.5,
+    "edge_density": 0.0,
+    "mean_h": 27.68,
+    "mean_s": 94.7,
+    "mean_v": 14.06,
+    "std_h": 19.33,
+    "std_s": 66.29,
+    "std_v": 10.93,
+    "gray_variance": 91.17,
+    "laplacian_variance": 61.28,
+    "gradient_magnitude_mean": 16.51,
+    "extent": 0.49,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.5517
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0144"
+}

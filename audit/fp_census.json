@@ -1,0 +1,151 @@
+{
+  "inventory": [
+    {
+      "class": "monster",
+      "count": 572,
+      "percentage": 50.6
+    },
+    {
+      "class": "player",
+      "count": 318,
+      "percentage": 28.1
+    },
+    {
+      "class": "unknown",
+      "count": 67,
+      "percentage": 5.9
+    },
+    {
+      "class": "decoration",
+      "count": 58,
+      "percentage": 5.1
+    },
+    {
+      "class": "flower",
+      "count": 48,
+      "percentage": 4.2
+    },
+    {
+      "class": "combat cell",
+      "count": 22,
+      "percentage": 1.9
+    },
+    {
+      "class": "npc",
+      "count": 13,
+      "percentage": 1.2
+    },
+    {
+      "class": "tree",
+      "count": 11,
+      "percentage": 1.0
+    },
+    {
+      "class": "building edge",
+      "count": 9,
+      "percentage": 0.8
+    },
+    {
+      "class": "movement cell",
+      "count": 8,
+      "percentage": 0.7
+    },
+    {
+      "class": "roof",
+      "count": 4,
+      "percentage": 0.4
+    }
+  ],
+  "detector_contribution": {
+    "combat_base": {
+      "total_accepted": 914,
+      "true_entities": 884,
+      "false_positives": 30,
+      "precision_pct": 96.7
+    },
+    "contour": {
+      "total_accepted": 103,
+      "true_entities": 6,
+      "false_positives": 97,
+      "precision_pct": 5.8
+    },
+    "hsv": {
+      "total_accepted": 113,
+      "true_entities": 13,
+      "false_positives": 100,
+      "precision_pct": 11.5
+    }
+  },
+  "severity_tiers": {
+    "Critical FP": 30,
+    "Moderate FP": 72,
+    "Minor FP": 125
+  },
+  "player_recall": {
+    "recall_pct": 0.0,
+    "detected_frames": 0,
+    "total_frames": 151,
+    "miss_reasons": {
+      "NMS suppression": 0,
+      "ROI clipping": 0,
+      "filtering rejection": 0,
+      "no candidate generated": 151
+    }
+  },
+  "mob_recall": {
+    "recall_pct": 0.0,
+    "detected_frames": 0,
+    "total_frames": 151,
+    "miss_reasons": {
+      "NMS suppression": 0,
+      "ROI clipping": 0,
+      "filtering rejection": 0,
+      "no candidate generated": 151
+    }
+  },
+  "combat_bbox_stats": {
+    "player_width": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0
+    },
+    "player_height": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0
+    },
+    "monster_width": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0
+    },
+    "monster_height": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0
+    },
+    "base_ring_height": {
+      "min": 8.0,
+      "max": 50.0,
+      "mean": 19.375141242937854,
+      "median": 17.0,
+      "p95": 39.0
+    },
+    "expanded_sprite_height": {
+      "min": 38.0,
+      "max": 240.0,
+      "mean": 95.50734463276837,
+      "median": 81.0,
+      "p95": 192.0
+    },
+    "estimated_oversize_pct": 49.3
+  }
+}

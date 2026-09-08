@@ -1,0 +1,47 @@
+{
+  "candidate_id": 19,
+  "method": "contour",
+  "bbox": [
+    215,
+    407,
+    43,
+    22
+  ],
+  "area": 946.0,
+  "taxonomy_class": "unknown",
+  "severity": "Minor FP",
+  "diagnostics": {
+    "contour_area": 52.5,
+    "bounding_rect_area": 946.0,
+    "fill_ratio": 0.0555,
+    "edge_density": 0.1152,
+    "bbox_width": 43,
+    "bbox_height": 22,
+    "bbox_area": 946.0,
+    "aspect_ratio": 0.5116,
+    "mean_h": 20.75,
+    "mean_s": 157.02,
+    "mean_v": 26.92,
+    "std_h": 2.99,
+    "std_s": 26.08,
+    "std_v": 9.18,
+    "dominant_hue": 23,
+    "gray_variance": 63.3,
+    "laplacian_variance": 55.72,
+    "gradient_magnitude_mean": 22.1,
+    "extent": 0.0555,
+    "mask_ratio": 0.1438,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.1438
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0147"
+}

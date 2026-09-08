@@ -1,0 +1,32 @@
+{
+  "candidate_id": 5,
+  "method": "hsv",
+  "label": "player",
+  "bbox": [
+    725,
+    169,
+    16,
+    21
+  ],
+  "area": 336.0,
+  "bbox_width": 16,
+  "bbox_height": 21,
+  "aspect_ratio": 0.7619,
+  "diagnostics": {
+    "mask_pixels": 146,
+    "mask_ratio": 0.4345,
+    "dominant_hue": 20,
+    "contour_area": 110.5,
+    "fill_ratio": 0.3289
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ]
+}

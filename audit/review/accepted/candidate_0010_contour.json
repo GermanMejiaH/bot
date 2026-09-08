@@ -1,0 +1,47 @@
+{
+  "candidate_id": 10,
+  "method": "contour",
+  "bbox": [
+    615,
+    459,
+    76,
+    58
+  ],
+  "area": 4408.0,
+  "taxonomy_class": "building edge",
+  "severity": "Moderate FP",
+  "diagnostics": {
+    "contour_area": 700.0,
+    "bounding_rect_area": 4408.0,
+    "fill_ratio": 0.1588,
+    "edge_density": 0.0905,
+    "bbox_width": 76,
+    "bbox_height": 58,
+    "bbox_area": 4408.0,
+    "aspect_ratio": 0.7632,
+    "mean_h": 20.77,
+    "mean_s": 143.05,
+    "mean_v": 76.45,
+    "std_h": 3.1,
+    "std_s": 46.85,
+    "std_v": 12.46,
+    "dominant_hue": 19,
+    "gray_variance": 88.9,
+    "laplacian_variance": 126.87,
+    "gradient_magnitude_mean": 25.11,
+    "extent": 0.1588,
+    "mask_ratio": 0.2021,
+    "connected_component_count": 3,
+    "largest_connected_component_ratio": 0.2001
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0148"
+}

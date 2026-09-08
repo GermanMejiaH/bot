@@ -1,0 +1,53 @@
+{
+  "candidate_id": 22,
+  "method": "combat_base",
+  "bbox": [
+    832,
+    322,
+    21,
+    67
+  ],
+  "area": 1407.0,
+  "taxonomy_class": "player",
+  "severity": "None",
+  "diagnostics": {
+    "red_pixels": 0,
+    "blue_pixels": 68,
+    "red_ratio": 0.0,
+    "blue_ratio": 0.2313,
+    "mask_area": 68,
+    "fill_ratio": 0.2313,
+    "sat_std": 0.0,
+    "val_std": 0.0,
+    "edge_density": 0.1343,
+    "has_blue": true,
+    "ring_w": 21,
+    "ring_h": 14,
+    "bbox_width": 21,
+    "bbox_height": 67,
+    "bbox_area": 1407.0,
+    "aspect_ratio": 3.1905,
+    "mean_h": 35.19,
+    "mean_s": 111.72,
+    "mean_v": 211.35,
+    "std_h": 19.88,
+    "std_s": 32.15,
+    "std_v": 17.17,
+    "dominant_hue": 23,
+    "gray_variance": 303.41,
+    "laplacian_variance": 234.34,
+    "gradient_magnitude_mean": 35.21,
+    "extent": 0.0,
+    "mask_ratio": 0.0,
+    "connected_component_count": 0,
+    "largest_connected_component_ratio": 0.0
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0135"
+}

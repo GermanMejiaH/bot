@@ -1,0 +1,29 @@
+{
+  "device": "CPU",
+  "memory_rss_mb": 58.49,
+  "model_memory_mb": 58.49,
+  "batch_size_1": {
+    "batch_size": 1,
+    "iterations": 100,
+    "batch_latency_mean_ms": 12.71364999935031,
+    "batch_latency_median_ms": 12.695000041276217,
+    "batch_latency_p95_ms": 13.654740009224042,
+    "batch_latency_max_ms": 14.898600056767464,
+    "per_crop_latency_mean_ms": 12.71364999935031,
+    "per_crop_latency_median_ms": 12.695000041276217,
+    "per_crop_latency_p95_ms": 13.654740009224042,
+    "throughput_crops_per_sec": 78.65561817818659
+  },
+  "batch_size_8": {
+    "batch_size": 8,
+    "iterations": 100,
+    "batch_latency_mean_ms": 36.43851899076253,
+    "batch_latency_median_ms": 33.72129995841533,
+    "batch_latency_p95_ms": 45.455019996734336,
+    "batch_latency_max_ms": 132.68699997570366,
+    "per_crop_latency_mean_ms": 4.5548148738453165,
+    "per_crop_latency_median_ms": 4.215162494801916,
+    "per_crop_latency_p95_ms": 5.681877499591792,
+    "throughput_crops_per_sec": 219.54789112115304
+  }
+}

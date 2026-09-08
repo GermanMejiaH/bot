@@ -1,0 +1,53 @@
+{
+  "candidate_id": 82,
+  "method": "combat_base",
+  "bbox": [
+    623,
+    281,
+    20,
+    81
+  ],
+  "area": 1620.0,
+  "taxonomy_class": "flower",
+  "severity": "Moderate FP",
+  "diagnostics": {
+    "red_pixels": 201,
+    "blue_pixels": 0,
+    "red_ratio": 0.5912,
+    "blue_ratio": 0.0,
+    "mask_area": 201,
+    "fill_ratio": 0.5912,
+    "sat_std": 40.51,
+    "val_std": 12.67,
+    "edge_density": 0.0907,
+    "has_blue": false,
+    "ring_w": 20,
+    "ring_h": 17,
+    "bbox_width": 20,
+    "bbox_height": 81,
+    "bbox_area": 1620.0,
+    "aspect_ratio": 4.05,
+    "mean_h": 61.22,
+    "mean_s": 115.48,
+    "mean_v": 152.34,
+    "std_h": 27.84,
+    "std_s": 56.85,
+    "std_v": 19.55,
+    "dominant_hue": 78,
+    "gray_variance": 880.67,
+    "laplacian_variance": 438.31,
+    "gradient_magnitude_mean": 49.88,
+    "extent": 0.0,
+    "mask_ratio": 0.0,
+    "connected_component_count": 0,
+    "largest_connected_component_ratio": 0.0
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0063"
+}

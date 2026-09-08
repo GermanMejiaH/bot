@@ -1,0 +1,36 @@
+{
+  "candidate_id": 12,
+  "method": "combat_base",
+  "label": "monster",
+  "bbox": [
+    196,
+    485,
+    20,
+    76
+  ],
+  "area": 1520.0,
+  "bbox_width": 20,
+  "bbox_height": 76,
+  "aspect_ratio": 0.2632,
+  "diagnostics": {
+    "red_pixels": 83,
+    "blue_pixels": 0,
+    "red_ratio": 0.2594,
+    "blue_ratio": 0.0,
+    "mask_area": 83,
+    "fill_ratio": 0.2594,
+    "sat_std": 0.0,
+    "val_std": 0.0,
+    "edge_density": 0.2071,
+    "has_blue": false,
+    "ring_w": 20,
+    "ring_h": 16
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ]
+}

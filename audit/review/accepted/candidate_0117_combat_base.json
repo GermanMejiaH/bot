@@ -1,0 +1,53 @@
+{
+  "candidate_id": 117,
+  "method": "combat_base",
+  "bbox": [
+    600,
+    229,
+    21,
+    50
+  ],
+  "area": 1050.0,
+  "taxonomy_class": "combat cell",
+  "severity": "Critical FP",
+  "diagnostics": {
+    "red_pixels": 50,
+    "blue_pixels": 0,
+    "red_ratio": 0.2976,
+    "blue_ratio": 0.0,
+    "mask_area": 50,
+    "fill_ratio": 0.2976,
+    "sat_std": 0.0,
+    "val_std": 0.0,
+    "edge_density": 0.1171,
+    "has_blue": false,
+    "ring_w": 21,
+    "ring_h": 8,
+    "bbox_width": 21,
+    "bbox_height": 50,
+    "bbox_area": 1050.0,
+    "aspect_ratio": 2.381,
+    "mean_h": 65.18,
+    "mean_s": 117.53,
+    "mean_v": 158.23,
+    "std_h": 25.2,
+    "std_s": 51.39,
+    "std_v": 20.02,
+    "dominant_hue": 77,
+    "gray_variance": 563.5,
+    "laplacian_variance": 451.74,
+    "gradient_magnitude_mean": 39.39,
+    "extent": 0.0,
+    "mask_ratio": 0.0,
+    "connected_component_count": 0,
+    "largest_connected_component_ratio": 0.0
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0068"
+}

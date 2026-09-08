@@ -1,0 +1,48 @@
+{
+  "candidate_id": 45,
+  "method": "hsv",
+  "bbox": [
+    1049,
+    375,
+    46,
+    157
+  ],
+  "area": 7222.0,
+  "taxonomy_class": "building edge",
+  "severity": "Moderate FP",
+  "diagnostics": {
+    "mask_pixels": 3319,
+    "mask_ratio": 0.4596,
+    "dominant_hue": 22,
+    "contour_area": 3164.5,
+    "fill_ratio": 0.4382,
+    "bbox_width": 46,
+    "bbox_height": 157,
+    "bbox_area": 7222.0,
+    "aspect_ratio": 3.413,
+    "edge_density": 0.0201,
+    "mean_h": 16.3,
+    "mean_s": 152.49,
+    "mean_v": 14.4,
+    "std_h": 9.66,
+    "std_s": 89.82,
+    "std_v": 9.68,
+    "gray_variance": 57.27,
+    "laplacian_variance": 13.29,
+    "gradient_magnitude_mean": 9.42,
+    "extent": 0.4382,
+    "connected_component_count": 5,
+    "largest_connected_component_ratio": 0.4488
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0148"
+}

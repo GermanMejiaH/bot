@@ -1,0 +1,48 @@
+{
+  "candidate_id": 15,
+  "method": "hsv",
+  "bbox": [
+    0,
+    607,
+    89,
+    47
+  ],
+  "area": 4183.0,
+  "taxonomy_class": "movement cell",
+  "severity": "Critical FP",
+  "diagnostics": {
+    "mask_pixels": 3542,
+    "mask_ratio": 0.8661,
+    "dominant_hue": 35,
+    "contour_area": 3393.5,
+    "fill_ratio": 0.8113,
+    "bbox_width": 89,
+    "bbox_height": 47,
+    "bbox_area": 4183.0,
+    "aspect_ratio": 0.5281,
+    "edge_density": 0.2328,
+    "mean_h": 31.83,
+    "mean_s": 211.87,
+    "mean_v": 150.01,
+    "std_h": 5.46,
+    "std_s": 17.06,
+    "std_v": 23.41,
+    "gray_variance": 558.84,
+    "laplacian_variance": 570.39,
+    "gradient_magnitude_mean": 55.03,
+    "extent": 0.8113,
+    "connected_component_count": 4,
+    "largest_connected_component_ratio": 0.8448
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0135"
+}

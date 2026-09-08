@@ -1,0 +1,32 @@
+{
+  "candidate_id": 13,
+  "method": "hsv",
+  "label": "monster",
+  "bbox": [
+    120,
+    607,
+    14,
+    17
+  ],
+  "area": 238.0,
+  "bbox_width": 14,
+  "bbox_height": 17,
+  "aspect_ratio": 0.8235,
+  "diagnostics": {
+    "mask_pixels": 95,
+    "mask_ratio": 0.3992,
+    "dominant_hue": 34,
+    "contour_area": 53.5,
+    "fill_ratio": 0.2248
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ]
+}

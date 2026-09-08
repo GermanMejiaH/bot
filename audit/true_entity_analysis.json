@@ -1,0 +1,349 @@
+{
+  "total_true_entities": 40,
+  "method_contribution": {
+    "contour": {
+      "entity_count": 12,
+      "player_count": 1,
+      "monster_count": 11,
+      "npc_count": 0,
+      "entity_share_pct": 30.0
+    },
+    "hsv": {
+      "entity_count": 12,
+      "player_count": 1,
+      "monster_count": 11,
+      "npc_count": 0,
+      "entity_share_pct": 30.0
+    },
+    "combat_base": {
+      "entity_count": 16,
+      "player_count": 4,
+      "monster_count": 12,
+      "npc_count": 0,
+      "entity_share_pct": 40.0
+    }
+  },
+  "entity_geometry_profiles": {
+    "player": {
+      "sample_count": 6,
+      "average_width": 28.0,
+      "average_height": 87.67,
+      "average_area": 2914.17,
+      "average_aspect_ratio": 0.42
+    },
+    "monster": {
+      "sample_count": 34,
+      "average_width": 35.5,
+      "average_height": 55.62,
+      "average_area": 2365.32,
+      "average_aspect_ratio": 0.85
+    },
+    "npc": {
+      "sample_count": 0,
+      "average_width": 0.0,
+      "average_height": 0.0,
+      "average_area": 0.0,
+      "average_aspect_ratio": 0.0
+    }
+  },
+  "detector_signature_ranges": {
+    "aspect_ratio": {
+      "p50_range": [
+        0.3119,
+        1.0487
+      ],
+      "p75_range": [
+        0.2818,
+        1.5431
+      ],
+      "p90_range": [
+        0.262,
+        1.8936
+      ]
+    },
+    "fill_ratio": {
+      "p50_range": [
+        0.2687,
+        0.4865
+      ],
+      "p75_range": [
+        0.2149,
+        0.5348
+      ],
+      "p90_range": [
+        0.1807,
+        0.7037
+      ]
+    },
+    "edge_density": {
+      "p50_range": [
+        0.1594,
+        0.2379
+      ],
+      "p75_range": [
+        0.1316,
+        0.279
+      ],
+      "p90_range": [
+        0.1195,
+        0.3093
+      ]
+    },
+    "mask_ratio": {
+      "p50_range": [
+        0.289,
+        0.4611
+      ],
+      "p75_range": [
+        0.1885,
+        0.5634
+      ],
+      "p90_range": [
+        0.1145,
+        0.7947
+      ]
+    }
+  },
+  "telemetry_statistics_by_method": {
+    "contour": {
+      "bbox_width": {
+        "count": 12,
+        "min": 13.0,
+        "max": 56.0,
+        "mean": 32.0,
+        "median": 28.5,
+        "std": 13.1426,
+        "p95": 52.15
+      },
+      "bbox_height": {
+        "count": 12,
+        "min": 17.0,
+        "max": 84.0,
+        "mean": 33.0833,
+        "median": 25.0,
+        "std": 18.0074,
+        "p95": 61.45
+      },
+      "bbox_area": {
+        "count": 12,
+        "min": 286.0,
+        "max": 4116.0,
+        "mean": 1214.8333,
+        "median": 739.5,
+        "std": 1110.2975,
+        "p95": 2991.8
+      },
+      "aspect_ratio": {
+        "count": 12,
+        "min": 0.5833,
+        "max": 1.5135,
+        "mean": 1.0159,
+        "median": 1.0116,
+        "std": 0.2562,
+        "p95": 1.3411
+      },
+      "fill_ratio": {
+        "count": 12,
+        "min": 0.1942,
+        "max": 0.5333,
+        "mean": 0.3764,
+        "median": 0.4193,
+        "std": 0.1378,
+        "p95": 0.5321
+      },
+      "edge_density": {
+        "count": 12,
+        "min": 0.1195,
+        "max": 0.2396,
+        "mean": 0.1857,
+        "median": 0.2019,
+        "std": 0.0467,
+        "p95": 0.2389
+      },
+      "contour_area": {
+        "count": 12,
+        "min": 85.5,
+        "max": 1189.5,
+        "mean": 379.125,
+        "median": 359.5,
+        "std": 277.0971,
+        "p95": 783.6
+      }
+    },
+    "hsv": {
+      "bbox_width": {
+        "count": 12,
+        "min": 12.0,
+        "max": 89.0,
+        "mean": 38.1667,
+        "median": 25.5,
+        "std": 30.6678,
+        "p95": 89.0
+      },
+      "bbox_height": {
+        "count": 12,
+        "min": 16.0,
+        "max": 47.0,
+        "mean": 29.6667,
+        "median": 26.5,
+        "std": 11.0316,
+        "p95": 47.0
+      },
+      "bbox_area": {
+        "count": 12,
+        "min": 238.0,
+        "max": 4183.0,
+        "mean": 1377.6667,
+        "median": 546.0,
+        "std": 1519.7717,
+        "p95": 4183.0
+      },
+      "aspect_ratio": {
+        "count": 12,
+        "min": 0.3077,
+        "max": 1.9714,
+        "mean": 1.1917,
+        "median": 1.024,
+        "std": 0.6219,
+        "p95": 1.9286
+      },
+      "mask_ratio": {
+        "count": 12,
+        "min": 0.1014,
+        "max": 0.8508,
+        "mean": 0.4392,
+        "median": 0.4266,
+        "std": 0.2283,
+        "p95": 0.8486
+      },
+      "mask_pixels": {
+        "count": 12,
+        "min": 95.0,
+        "max": 3559.0,
+        "mean": 753.9167,
+        "median": 190.0,
+        "std": 1308.17,
+        "p95": 3549.65
+      },
+      "dominant_hue": {
+        "count": 12,
+        "min": 9.0,
+        "max": 50.0,
+        "mean": 31.75,
+        "median": 34.0,
+        "std": 11.2745,
+        "p95": 48.35
+      }
+    },
+    "combat_base": {
+      "bbox_width": {
+        "count": 16,
+        "min": 14.0,
+        "max": 82.0,
+        "mean": 33.3125,
+        "median": 31.0,
+        "std": 18.1722,
+        "p95": 62.5
+      },
+      "bbox_height": {
+        "count": 16,
+        "min": 43.0,
+        "max": 196.0,
+        "mean": 104.0,
+        "median": 110.0,
+        "std": 45.8766,
+        "p95": 163.75
+      },
+      "bbox_area": {
+        "count": 16,
+        "min": 602.0,
+        "max": 16072.0,
+        "mean": 4174.75,
+        "median": 3410.0,
+        "std": 3926.232,
+        "p95": 9646.0
+      },
+      "aspect_ratio": {
+        "count": 16,
+        "min": 0.2374,
+        "max": 0.4184,
+        "mean": 0.3176,
+        "median": 0.3078,
+        "std": 0.0597,
+        "p95": 0.418
+      },
+      "red_ratio": {
+        "count": 16,
+        "min": 0.0,
+        "max": 0.698,
+        "mean": 0.3687,
+        "median": 0.341,
+        "std": 0.1716,
+        "p95": 0.6051
+      },
+      "blue_ratio": {
+        "count": 16,
+        "min": 0.0,
+        "max": 0.4524,
+        "mean": 0.0518,
+        "median": 0.0,
+        "std": 0.1274,
+        "p95": 0.3095
+      },
+      "mask_area": {
+        "count": 16,
+        "min": 38.0,
+        "max": 878.0,
+        "mean": 354.3125,
+        "median": 346.0,
+        "std": 279.1255,
+        "p95": 747.5
+      },
+      "fill_ratio": {
+        "count": 16,
+        "min": 0.2594,
+        "max": 0.698,
+        "mean": 0.4205,
+        "median": 0.4133,
+        "std": 0.1272,
+        "p95": 0.6051
+      },
+      "edge_density": {
+        "count": 16,
+        "min": 0.0997,
+        "max": 0.3167,
+        "mean": 0.2165,
+        "median": 0.2061,
+        "std": 0.0653,
+        "p95": 0.3125
+      },
+      "sat_std": {
+        "count": 16,
+        "min": 0.0,
+        "max": 86.85,
+        "mean": 28.7338,
+        "median": 16.47,
+        "std": 32.4348,
+        "p95": 83.07
+      },
+      "val_std": {
+        "count": 16,
+        "min": 0.0,
+        "max": 83.77,
+        "mean": 27.8087,
+        "median": 8.22,
+        "std": 32.9711,
+        "p95": 80.35
+      }
+    }
+  },
+  "answers_to_final_questions": {
+    "Q1_common_characteristics": "True entities have compact bounding boxes (avg area 700-1500 px), vertical-to-square aspect ratios (0.35 to 0.70), fill ratio between 0.10 and 0.40, and moderate-to-high edge density (0.10 to 0.35).",
+    "Q2_highest_entity_count_detector": "combat_base (16 true entities, 40.0% of total true entities).",
+    "Q3_cleanest_detector": "contour (highest precision 35.29% and clean bounding box boundaries).",
+    "Q4_aspect_ratio_range": "90% of true entities fall in aspect ratio range [0.262, 1.8936].",
+    "Q5_fill_ratio_range": "90% of true entities fall in fill ratio range [0.1807, 0.7037].",
+    "Q6_edge_density_range": "90% of true entities fall in edge density range [0.1195, 0.3093].",
+    "Q7_scenery_separators": "Entities exhibit higher internal edge density (0.10-0.35 vs <0.08 for background tiles), tight vertical aspect ratio (0.35-0.70 vs wide/extreme >1.2 for roofs/walls), and localized color ring responses."
+  }
+}

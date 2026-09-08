@@ -1,0 +1,36 @@
+{
+  "candidate_id": 5,
+  "method": "combat_base",
+  "label": "player",
+  "bbox": [
+    582,
+    127,
+    33,
+    139
+  ],
+  "area": 4587.0,
+  "bbox_width": 33,
+  "bbox_height": 139,
+  "aspect_ratio": 0.2374,
+  "diagnostics": {
+    "red_pixels": 668,
+    "blue_pixels": 0,
+    "red_ratio": 0.698,
+    "blue_ratio": 0.0,
+    "mask_area": 668,
+    "fill_ratio": 0.698,
+    "sat_std": 81.81,
+    "val_std": 79.21,
+    "edge_density": 0.148,
+    "has_blue": false,
+    "ring_w": 33,
+    "ring_h": 29
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ]
+}

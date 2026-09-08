@@ -1,0 +1,82 @@
+{
+  "training_date": "2026-09-08T02:45:17.933449+00:00",
+  "feature_extractor": "MobileNetV3 Small (576-d)",
+  "selected_model": "Logistic Regression (L2)",
+  "dataset_size": 152,
+  "train_size": 115,
+  "holdout_size": 37,
+  "cv_results": {
+    "Logistic Regression (L2)": 0.9333333333333332,
+    "Random Forest": 0.9164335664335665,
+    "XGBoost": 0.8929292929292929
+  },
+  "holdout_evaluation": {
+    "baseline_heuristic": {
+      "precision": 0.2972972972972973,
+      "recall": 1.0,
+      "f1": 0.4583333333333333
+    },
+    "visual_classifier": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "pr_auc": 1.0,
+      "roc_auc": 1.0,
+      "confusion_matrix": [
+        [
+          26,
+          0
+        ],
+        [
+          0,
+          11
+        ]
+      ]
+    },
+    "per_detector_breakdown": {
+      "contour": {
+        "sample_count": 12,
+        "true_positives_count": 4,
+        "baseline": {
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "classifier": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "hsv": {
+        "sample_count": 13,
+        "true_positives_count": 4,
+        "baseline": {
+          "precision": 0.3076923076923077,
+          "recall": 1.0,
+          "f1": 0.47058823529411764
+        },
+        "classifier": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "combat_base": {
+        "sample_count": 12,
+        "true_positives_count": 3,
+        "baseline": {
+          "precision": 0.25,
+          "recall": 1.0,
+          "f1": 0.4
+        },
+        "classifier": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "total_samples": 152,
+  "true_positives": 40,
+  "false_positives": 112,
+  "hog_dim": 128,
+  "orb_dim": 130,
+  "mobilenet_dim": 1024
+}

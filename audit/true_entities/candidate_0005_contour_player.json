@@ -1,0 +1,30 @@
+{
+  "candidate_id": 5,
+  "method": "contour",
+  "label": "player",
+  "bbox": [
+    640,
+    545,
+    13,
+    22
+  ],
+  "area": 286.0,
+  "bbox_width": 13,
+  "bbox_height": 22,
+  "aspect_ratio": 0.5909,
+  "diagnostics": {
+    "contour_area": 108.5,
+    "bounding_rect_area": 286.0,
+    "fill_ratio": 0.3794,
+    "edge_density": 0.2378
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ]
+}

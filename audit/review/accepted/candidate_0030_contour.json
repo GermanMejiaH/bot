@@ -1,0 +1,47 @@
+{
+  "candidate_id": 30,
+  "method": "contour",
+  "bbox": [
+    835,
+    207,
+    23,
+    37
+  ],
+  "area": 851.0,
+  "taxonomy_class": "player",
+  "severity": "None",
+  "diagnostics": {
+    "contour_area": 355.5,
+    "bounding_rect_area": 851.0,
+    "fill_ratio": 0.4177,
+    "edge_density": 0.1504,
+    "bbox_width": 23,
+    "bbox_height": 37,
+    "bbox_area": 851.0,
+    "aspect_ratio": 1.6087,
+    "mean_h": 26.64,
+    "mean_s": 142.39,
+    "mean_v": 43.39,
+    "std_h": 2.46,
+    "std_s": 14.07,
+    "std_v": 13.59,
+    "dominant_hue": 27,
+    "gray_variance": 166.68,
+    "laplacian_variance": 160.67,
+    "gradient_magnitude_mean": 30.06,
+    "extent": 0.4177,
+    "mask_ratio": 0.2315,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.2315
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0140"
+}

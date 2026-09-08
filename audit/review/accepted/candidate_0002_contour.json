@@ -1,0 +1,47 @@
+{
+  "candidate_id": 2,
+  "method": "contour",
+  "bbox": [
+    672,
+    419,
+    56,
+    94
+  ],
+  "area": 5264.0,
+  "taxonomy_class": "tree",
+  "severity": "Moderate FP",
+  "diagnostics": {
+    "contour_area": 3233.0,
+    "bounding_rect_area": 5264.0,
+    "fill_ratio": 0.6142,
+    "bbox_width": 56,
+    "bbox_height": 94,
+    "bbox_area": 5264.0,
+    "aspect_ratio": 1.6786,
+    "edge_density": 0.1121,
+    "mean_h": 74.2,
+    "mean_s": 51.95,
+    "mean_v": 85.48,
+    "std_h": 80.17,
+    "std_s": 66.81,
+    "std_v": 87.79,
+    "dominant_hue": 0,
+    "gray_variance": 4522.11,
+    "laplacian_variance": 6309.85,
+    "gradient_magnitude_mean": 93.06,
+    "extent": 0.6142,
+    "mask_ratio": 0.2177,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.2177
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0004"
+}

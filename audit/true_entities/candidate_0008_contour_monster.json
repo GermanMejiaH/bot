@@ -1,0 +1,30 @@
+{
+  "candidate_id": 8,
+  "method": "contour",
+  "label": "monster",
+  "bbox": [
+    883,
+    480,
+    23,
+    25
+  ],
+  "area": 575.0,
+  "bbox_width": 23,
+  "bbox_height": 25,
+  "aspect_ratio": 0.92,
+  "diagnostics": {
+    "contour_area": 264.0,
+    "bounding_rect_area": 575.0,
+    "fill_ratio": 0.4591,
+    "edge_density": 0.193
+  },
+  "triggered_rules": [
+    "canny_edge_extract",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "candidate_id": 24,
+  "method": "hsv",
+  "bbox": [
+    1164,
+    376,
+    15,
+    21
+  ],
+  "area": 315.0,
+  "taxonomy_class": "flower",
+  "severity": "Moderate FP",
+  "diagnostics": {
+    "mask_pixels": 99,
+    "mask_ratio": 0.3143,
+    "dominant_hue": 0,
+    "contour_area": 38.5,
+    "fill_ratio": 0.1222,
+    "bbox_width": 15,
+    "bbox_height": 21,
+    "bbox_area": 315.0,
+    "aspect_ratio": 1.4,
+    "edge_density": 0.0222,
+    "mean_h": 22.47,
+    "mean_s": 84.09,
+    "mean_v": 9.32,
+    "std_h": 19.5,
+    "std_s": 73.78,
+    "std_v": 9.91,
+    "gray_variance": 75.11,
+    "laplacian_variance": 92.8,
+    "gradient_magnitude_mean": 28.48,
+    "extent": 0.1222,
+    "connected_component_count": 3,
+    "largest_connected_component_ratio": 0.1937
+  },
+  "triggered_rules": [
+    "hsv_segmentation_pass",
+    "green_tile_exclusion_pass",
+    "min_max_width_pass",
+    "min_max_height_pass",
+    "min_max_area_pass",
+    "aspect_ratio_pass",
+    "contour_fill_ratio_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0144"
+}

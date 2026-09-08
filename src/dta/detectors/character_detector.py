@@ -54,6 +54,133 @@ class CharacterDetector:
         passed, _ = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
         return passed
 
+    def _compute_candidate_diagnostics(
+        self,
+        frame: np.ndarray,
+        hsv: np.ndarray | None,
+        edges: np.ndarray | None,
+        bbox: tuple[int, int, int, int],
+        mask_crop: np.ndarray | None = None,
+        cnt_area: float = 0.0,
+        base_diag: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Compute comprehensive diagnostic features across geometry, edges, color, texture, and mask."""
+        x, y, w, h = bbox
+        bbox_area = float(w * h)
+        aspect_ratio = float(h / float(w)) if w > 0 else 0.0
+
+        diag: dict[str, Any] = base_diag.copy() if base_diag else {}
+
+        # Geometry
+        diag["bbox_width"] = int(w)
+        diag["bbox_height"] = int(h)
+        diag["bbox_area"] = float(bbox_area)
+        diag["aspect_ratio"] = round(aspect_ratio, 4)
+
+        # Safe crop slicing
+        img_h, img_w = frame.shape[:2]
+        x1, y1 = max(0, x), max(0, y)
+        x2, y2 = min(img_w, x + w), min(img_h, y + h)
+
+        crop_bgr = frame[y1:y2, x1:x2]
+        if crop_bgr.size == 0 or bbox_area == 0:
+            default_keys = [
+                "extent",
+                "edge_density",
+                "mean_h",
+                "mean_s",
+                "mean_v",
+                "std_h",
+                "std_s",
+                "std_v",
+                "dominant_hue",
+                "gray_variance",
+                "laplacian_variance",
+                "gradient_magnitude_mean",
+                "mask_ratio",
+                "largest_connected_component_ratio",
+                "connected_component_count",
+            ]
+            for k in default_keys:
+                diag.setdefault(k, 0.0 if "count" not in k and "dominant" not in k else 0)
+            return diag
+
+        # Grayscale & HSV crops
+        crop_gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY) if len(crop_bgr.shape) == 3 else crop_bgr
+        if hsv is not None and hsv.shape[:2] == frame.shape[:2]:
+            crop_hsv = hsv[y1:y2, x1:x2]
+        else:
+            crop_hsv = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2HSV) if len(crop_bgr.shape) == 3 else crop_bgr
+
+        # Edges
+        if edges is not None and edges.shape[:2] == frame.shape[:2]:
+            crop_edges = edges[y1:y2, x1:x2]
+        else:
+            blurred = cv2.GaussianBlur(crop_gray, (3, 3), 0)
+            crop_edges = cv2.Canny(blurred, 30, 90)
+
+        edge_pixels = float(np.count_nonzero(crop_edges))
+        edge_density = edge_pixels / bbox_area
+        diag["edge_density"] = round(edge_density, 4)
+
+        # Colors (HSV)
+        h_chan = crop_hsv[:, :, 0]
+        s_chan = crop_hsv[:, :, 1]
+        v_chan = crop_hsv[:, :, 2]
+
+        diag["mean_h"] = round(float(np.mean(h_chan)), 2)
+        diag["mean_s"] = round(float(np.mean(s_chan)), 2)
+        diag["mean_v"] = round(float(np.mean(v_chan)), 2)
+
+        diag["std_h"] = round(float(np.std(h_chan)), 2)
+        diag["std_s"] = round(float(np.std(s_chan)), 2)
+        diag["std_v"] = round(float(np.std(v_chan)), 2)
+
+        hist = cv2.calcHist([h_chan], [0], None, [180], [0, 180])
+        dominant_hue = int(np.argmax(hist))
+        diag["dominant_hue"] = dominant_hue
+
+        # Texture
+        diag["gray_variance"] = round(float(np.var(crop_gray)), 2)
+        diag["laplacian_variance"] = round(float(cv2.Laplacian(crop_gray, cv2.CV_64F).var()), 2)
+
+        sobelx = cv2.Sobel(crop_gray, cv2.CV_64F, 1, 0, ksize=3)
+        sobely = cv2.Sobel(crop_gray, cv2.CV_64F, 0, 1, ksize=3)
+        grad_mag = np.hypot(sobelx, sobely)
+        diag["gradient_magnitude_mean"] = round(float(np.mean(grad_mag)), 2)
+
+        # Mask Features
+        if mask_crop is not None and mask_crop.size > 0:
+            m_crop = mask_crop[: y2 - y1, : x2 - x1]
+            mask_pixels = float(np.count_nonzero(m_crop))
+            mask_ratio = mask_pixels / bbox_area
+            extent = cnt_area / bbox_area if cnt_area > 0 else mask_ratio
+
+            binary_mask = (m_crop > 0).astype(np.uint8)
+            num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(binary_mask)
+
+            if num_labels > 1:
+                cc_areas = stats[1:, cv2.CC_STAT_AREA]
+                cc_count = len(cc_areas)
+                largest_cc_area = float(np.max(cc_areas))
+                largest_cc_ratio = largest_cc_area / bbox_area
+            else:
+                cc_count = 0
+                largest_cc_ratio = 0.0
+        else:
+            mask_ratio = cnt_area / bbox_area if cnt_area > 0 else 0.0
+            extent = mask_ratio
+            cc_count = 1 if cnt_area > 0 else 0
+            largest_cc_ratio = mask_ratio
+
+        diag["extent"] = round(extent, 4)
+        diag["mask_ratio"] = round(mask_ratio, 4)
+        diag["connected_component_count"] = int(cc_count)
+        diag["largest_connected_component_ratio"] = round(largest_cc_ratio, 4)
+
+        return diag
+
+
     def detect_contours(self, frame: np.ndarray) -> list[RawCharacterDetection]:
         """Detect candidate character bounding boxes using image gradients and vertical morphology."""
         if frame is None or frame.size == 0:
@@ -336,12 +463,19 @@ class CharacterDetector:
             edge_region = edges[y : y + h, x : x + w]
             edge_density = float(np.count_nonzero(edge_region) / bbox_area) if bbox_area > 0 else 0.0
 
-            diagnostics = {
-                "contour_area": cnt_area,
-                "bounding_rect_area": bbox_area,
-                "fill_ratio": round(fill_ratio, 4),
-                "edge_density": round(edge_density, 4),
-            }
+            diagnostics = self._compute_candidate_diagnostics(
+                frame=frame,
+                hsv=None,
+                edges=edges,
+                bbox=(x, y, w, h),
+                mask_crop=closed_contours[y : y + h, x : x + w],
+                cnt_area=cnt_area,
+                base_diag={
+                    "contour_area": cnt_area,
+                    "bounding_rect_area": bbox_area,
+                    "fill_ratio": round(fill_ratio, 4),
+                },
+            )
 
             triggered_rules = ["canny_edge_extract"]
             if passed:
@@ -397,25 +531,20 @@ class CharacterDetector:
 
             passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
             mask_crop = closed_hsv[y : y + h, x : x + w]
-            mask_pixels = int(np.count_nonzero(mask_crop))
-            mask_ratio = round(mask_pixels / bbox_area, 4) if bbox_area > 0 else 0.0
             fill_ratio = round(cnt_area / bbox_area, 4) if bbox_area > 0 else 0.0
 
-            hsv_crop = hsv[y : y + h, x : x + w, 0]
-            non_zero_hues = hsv_crop[mask_crop > 0]
-            if len(non_zero_hues) > 0:
-                vals, counts = np.unique(non_zero_hues, return_counts=True)
-                dominant_hue = int(vals[np.argmax(counts)])
-            else:
-                dominant_hue = 0
-
-            diagnostics = {
-                "mask_pixels": mask_pixels,
-                "mask_ratio": mask_ratio,
-                "dominant_hue": dominant_hue,
-                "contour_area": cnt_area,
-                "fill_ratio": fill_ratio,
-            }
+            diagnostics = self._compute_candidate_diagnostics(
+                frame=frame,
+                hsv=hsv,
+                edges=edges,
+                bbox=(x, y, w, h),
+                mask_crop=mask_crop,
+                cnt_area=cnt_area,
+                base_diag={
+                    "contour_area": cnt_area,
+                    "fill_ratio": fill_ratio,
+                },
+            )
 
             triggered_rules = ["hsv_segmentation_pass", "green_tile_exclusion_pass"]
             if passed:
@@ -557,20 +686,30 @@ class CharacterDetector:
                 cid = candidate_counter
                 candidate_counter += 1
 
-                diagnostics = {
-                    "red_pixels": c_info["red_pixels"],
-                    "blue_pixels": c_info["blue_pixels"],
-                    "red_ratio": c_info["red_ratio"],
-                    "blue_ratio": c_info["blue_ratio"],
-                    "mask_area": c_info["mask_area"],
-                    "fill_ratio": round(c_info["fill_ratio"], 4),
-                    "sat_std": round(c_info["sat_std"], 2),
-                    "val_std": round(c_info["val_std"], 2),
-                    "edge_density": round(c_info["edge_density"], 4),
-                    "has_blue": c_info["has_blue"],
-                    "ring_w": w,
-                    "ring_h": h,
-                }
+                mask_crop = ring_mask[y : y + h, x : x + w]
+
+                diagnostics = self._compute_candidate_diagnostics(
+                    frame=frame,
+                    hsv=hsv,
+                    edges=edges,
+                    bbox=(x, char_y, w, sprite_h),
+                    mask_crop=mask_crop,
+                    cnt_area=float(c_info["mask_area"]),
+                    base_diag={
+                        "red_pixels": c_info["red_pixels"],
+                        "blue_pixels": c_info["blue_pixels"],
+                        "red_ratio": c_info["red_ratio"],
+                        "blue_ratio": c_info["blue_ratio"],
+                        "mask_area": c_info["mask_area"],
+                        "fill_ratio": round(c_info["fill_ratio"], 4),
+                        "sat_std": round(c_info["sat_std"], 2),
+                        "val_std": round(c_info["val_std"], 2),
+                        "has_blue": c_info["has_blue"],
+                        "ring_w": w,
+                        "ring_h": h,
+                    },
+                )
+
                 triggered_rules = [
                     "hsv_color_ring_pass",
                     "dim_aspect_ratio_pass",

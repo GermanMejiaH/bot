@@ -1,13 +1,13 @@
 {
-  "session_start_time": "2026-09-07T22:10:51.536883+00:00",
-  "session_end_time": "2026-09-07T22:10:59.840558+00:00",
-  "duration_seconds": 8.3,
+  "session_start_time": "2026-09-08T01:00:10.129964+00:00",
+  "session_end_time": "2026-09-08T01:00:40.786811+00:00",
+  "duration_seconds": 30.66,
   "metrics": {
     "total_frames_seen": 50,
     "total_frames_saved": 1,
-    "duplicate_frames_skipped": 35,
+    "duplicate_frames_skipped": 42,
     "combat_frames_saved": 0,
     "exploration_frames_saved": 1,
-    "average_frame_difference": 0.0278
+    "average_frame_difference": 0.0233
   }
 }

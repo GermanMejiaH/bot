@@ -1,0 +1,53 @@
+{
+  "candidate_id": 35,
+  "method": "combat_base",
+  "bbox": [
+    519,
+    530,
+    70,
+    168
+  ],
+  "area": 11760.0,
+  "taxonomy_class": "monster",
+  "severity": "None",
+  "diagnostics": {
+    "red_pixels": 592,
+    "blue_pixels": 0,
+    "red_ratio": 0.2916,
+    "blue_ratio": 0.0,
+    "mask_area": 592,
+    "fill_ratio": 0.2916,
+    "sat_std": 0.0,
+    "val_std": 0.0,
+    "edge_density": 0.2039,
+    "has_blue": false,
+    "ring_w": 70,
+    "ring_h": 29,
+    "bbox_width": 70,
+    "bbox_height": 168,
+    "bbox_area": 11760.0,
+    "aspect_ratio": 2.4,
+    "mean_h": 27.7,
+    "mean_s": 163.3,
+    "mean_v": 183.67,
+    "std_h": 9.16,
+    "std_s": 59.6,
+    "std_v": 48.09,
+    "dominant_hue": 22,
+    "gray_variance": 2355.08,
+    "laplacian_variance": 4354.03,
+    "gradient_magnitude_mean": 90.67,
+    "extent": 0.0,
+    "mask_ratio": 0.0,
+    "connected_component_count": 0,
+    "largest_connected_component_ratio": 0.0
+  },
+  "triggered_rules": [
+    "hsv_color_ring_pass",
+    "dim_aspect_ratio_pass",
+    "fill_sat_val_pass",
+    "sprite_edge_density_pass",
+    "nms_survived"
+  ],
+  "frame_id": "audit_0105"
+}

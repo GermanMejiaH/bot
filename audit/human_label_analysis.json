@@ -1,0 +1,138 @@
+{
+  "dataset_summary": {
+    "total_accepted_samples": 152,
+    "true_positives": 40,
+    "false_positives": 112,
+    "global_precision_pct": 26.32,
+    "global_fp_rate_pct": 73.68
+  },
+  "precision_by_method": {
+    "contour": {
+      "total": 34,
+      "true_positives": 12,
+      "false_positives": 22,
+      "precision_pct": 35.29,
+      "fp_rate_pct": 64.71
+    },
+    "hsv": {
+      "total": 51,
+      "true_positives": 12,
+      "false_positives": 39,
+      "precision_pct": 23.53,
+      "fp_rate_pct": 76.47
+    },
+    "combat_base": {
+      "total": 67,
+      "true_positives": 16,
+      "false_positives": 51,
+      "precision_pct": 23.88,
+      "fp_rate_pct": 76.12
+    }
+  },
+  "class_distribution": {
+    "decoration": {
+      "count": 39,
+      "percentage": 25.66
+    },
+    "unknown": {
+      "count": 38,
+      "percentage": 25.0
+    },
+    "monster": {
+      "count": 34,
+      "percentage": 22.37
+    },
+    "flower": {
+      "count": 16,
+      "percentage": 10.53
+    },
+    "movement_cell": {
+      "count": 14,
+      "percentage": 9.21
+    },
+    "player": {
+      "count": 6,
+      "percentage": 3.95
+    },
+    "box": {
+      "count": 3,
+      "percentage": 1.97
+    },
+    "bag": {
+      "count": 2,
+      "percentage": 1.32
+    }
+  },
+  "false_positive_distribution": {
+    "decoration": {
+      "count": 39,
+      "percentage": 34.82
+    },
+    "unknown": {
+      "count": 38,
+      "percentage": 33.93
+    },
+    "flower": {
+      "count": 16,
+      "percentage": 14.29
+    },
+    "movement_cell": {
+      "count": 14,
+      "percentage": 12.5
+    },
+    "box": {
+      "count": 3,
+      "percentage": 2.68
+    },
+    "bag": {
+      "count": 2,
+      "percentage": 1.79
+    }
+  },
+  "unknown_analysis": {
+    "total_unknown_count": 38,
+    "percentage_of_total": 25.0,
+    "unknown_by_method": {
+      "contour": 8,
+      "hsv": 15,
+      "combat_base": 15
+    },
+    "description": "Background terrain noise, map tile artifacts, or unrecognized structural fragments."
+  },
+  "method_class_matrix": {
+    "contour": {
+      "box": 2,
+      "unknown": 8,
+      "monster": 11,
+      "player": 1,
+      "bag": 1,
+      "movement_cell": 2,
+      "decoration": 9
+    },
+    "hsv": {
+      "unknown": 15,
+      "monster": 11,
+      "player": 1,
+      "movement_cell": 4,
+      "decoration": 15,
+      "flower": 5
+    },
+    "combat_base": {
+      "monster": 12,
+      "player": 4,
+      "bag": 1,
+      "movement_cell": 8,
+      "decoration": 15,
+      "box": 1,
+      "unknown": 15,
+      "flower": 11
+    }
+  },
+  "recommendations_for_phase_4": [
+    "1. Suppress Static Decoration & Unknown Noise: Combine color uniformity and edge density filters to remove 77 background false positives (68.75% of total FPs).",
+    "2. Suppress Vibrant Plant & Flower Sprites: Tighten HSV saturation/value ring bounds to eliminate 16 flower false positives.",
+    "3. Grid Cell Overlay Masking: Add UI/tactical grid pattern suppression to filter 14 movement cell false positives.",
+    "4. Refine Contour Bounds: Optimize area and aspect ratio filtering for contour candidate generation (currently 35.29% precision).",
+    "5. Multi-Feature Candidate Consensus: Require multi-channel validation before candidate acceptance for HSV and combat_base methods (~76% FP rate each)."
+  ]
+}
