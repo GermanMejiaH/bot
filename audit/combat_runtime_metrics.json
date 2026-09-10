@@ -1,0 +1,26 @@
+{
+  "folder": "combat",
+  "total_frames_audited": 99,
+  "total_heuristic_candidates": 844,
+  "total_classifier_accepted": 183,
+  "total_classifier_rejected": 661,
+  "acceptance_rate": 0.21682464454976302,
+  "rejection_rate": 0.783175355450237,
+  "detector_method_breakdown": {
+    "contour": {
+      "raw": 16,
+      "accepted": 1,
+      "rejected": 15
+    },
+    "hsv": {
+      "raw": 62,
+      "accepted": 6,
+      "rejected": 56
+    },
+    "combat_base": {
+      "raw": 766,
+      "accepted": 176,
+      "rejected": 590
+    }
+  }
+}

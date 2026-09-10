@@ -15,13 +15,15 @@ class CharacterDetector:
     def __init__(
         self,
         min_width: int = 12,
-        max_width: int = 95,
+        max_width: int = 120,
         min_height: int = 16,
         max_height: int = 160,
-        min_area: float = 200.0,
-        max_area: float = 12000.0,
-        min_aspect_ratio: float = 0.50,
-        max_aspect_ratio: float = 3.5,
+        min_area: float = 400.0,
+        max_area: float = 10000.0,
+        min_aspect_ratio: float = 0.22,
+        max_aspect_ratio: float = 1.75,
+        min_y: int = 40,
+        max_y: int = 600,
         iou_threshold: float = 0.35,
     ) -> None:
         self.min_width = min_width
@@ -32,11 +34,24 @@ class CharacterDetector:
         self.max_area = max_area
         self.min_aspect_ratio = min_aspect_ratio
         self.max_aspect_ratio = max_aspect_ratio
+        self.min_y = min_y
+        self.max_y = max_y
         self.iou_threshold = iou_threshold
 
-    def _filter_box_with_reason(self, w: int, h: int, bbox_area: float, cnt_area: float) -> tuple[bool, str]:
-        """Validate candidate bounding box dimensions and fill ratio returning pass status and reason string."""
-        aspect_ratio = h / float(w) if w > 0 else 0.0
+    def _filter_box_with_reason(
+        self,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        bbox_area: float,
+        cnt_area: float = 0.0,
+    ) -> tuple[bool, str]:
+        """Validate candidate bounding box dimensions, aspect ratio, ROI bounds, and fill ratio."""
+        aspect_ratio = w / float(max(1, h)) if h > 0 else 0.0
+        y_min = y
+        y_max = y + h
+
         if not (self.min_width <= w <= self.max_width):
             return False, f"failed_width ({w} not in [{self.min_width}, {self.max_width}])"
         if not (self.min_height <= h <= self.max_height):
@@ -45,14 +60,31 @@ class CharacterDetector:
             return False, f"failed_area ({bbox_area:.0f} not in [{self.min_area}, {self.max_area}])"
         if not (self.min_aspect_ratio <= aspect_ratio <= self.max_aspect_ratio):
             return False, f"failed_aspect_ratio ({aspect_ratio:.2f} not in [{self.min_aspect_ratio}, {self.max_aspect_ratio}])"
-        if bbox_area > 0 and (cnt_area / bbox_area) < 0.05:
+        if y_min < self.min_y or y_max > self.max_y:
+            return False, f"failed_roi_boundary (y_min={y_min}, y_max={y_max} not in [{self.min_y}, {self.max_y}])"
+        if cnt_area > 0 and bbox_area > 0 and (cnt_area / bbox_area) < 0.05:
             return False, f"failed_contour_fill_ratio ({cnt_area/bbox_area:.3f} < 0.05)"
         return True, "passed_filtering"
 
-    def _filter_box(self, w: int, h: int, bbox_area: float, cnt_area: float) -> bool:
+    def _filter_box(self, *args: Any, **kwargs: Any) -> bool:
         """Validate candidate bounding box dimensions and fill ratio."""
-        passed, _ = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
-        return passed
+        if len(args) == 4:
+            w, h, bbox_area, cnt_area = args
+            passed, _ = self._filter_box_with_reason(0, 50, w, h, bbox_area, cnt_area)
+            return passed
+        elif len(args) == 6:
+            x, y, w, h, bbox_area, cnt_area = args
+            passed, _ = self._filter_box_with_reason(x, y, w, h, bbox_area, cnt_area)
+            return passed
+        else:
+            x = kwargs.get("x", 0)
+            y = kwargs.get("y", 50)
+            w = kwargs.get("w", 0)
+            h = kwargs.get("h", 0)
+            bbox_area = kwargs.get("bbox_area", float(w * h))
+            cnt_area = kwargs.get("cnt_area", 0.0)
+            passed, _ = self._filter_box_with_reason(x, y, w, h, bbox_area, cnt_area)
+            return passed
 
     def _compute_candidate_diagnostics(
         self,
@@ -200,10 +232,12 @@ class CharacterDetector:
         for cnt in contours:
             cnt_area = float(cv2.contourArea(cnt))
             x, y, w, h = cv2.boundingRect(cnt)
-            bbox_area = float(w * h)
+            pad_h = int(h * 0.12)
+            h_padded = h + pad_h
+            bbox_area = float(w * h_padded)
 
-            if self._filter_box(w, h, bbox_area, cnt_area):
-                bbox = BoundingBox(x=x, y=y, w=w, h=h)
+            if self._filter_box(x, y, w, h_padded, bbox_area, cnt_area):
+                bbox = BoundingBox(x=x, y=y, w=w, h=h_padded)
                 detection = RawCharacterDetection(
                     bbox=bbox,
                     centroid=bbox.centroid,
@@ -248,7 +282,7 @@ class CharacterDetector:
             x, y, w, h = cv2.boundingRect(cnt)
             bbox_area = float(w * h)
 
-            if self._filter_box(w, h, bbox_area, cnt_area):
+            if self._filter_box(x, y, w, h, bbox_area, cnt_area):
                 bbox = BoundingBox(x=x, y=y, w=w, h=h)
                 detections.append(
                     RawCharacterDetection(
@@ -272,7 +306,7 @@ class CharacterDetector:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
         edges = cv2.Canny(gray, 40, 120)
 
-        # Red & Blue ring masks (S>=50, V>=70)
+        # Red & Blue ring masks (S>=85, V>=85)
         r1 = cv2.inRange(hsv, np.array([0, 85, 85]), np.array([12, 255, 255]))
         r2 = cv2.inRange(hsv, np.array([165, 85, 85]), np.array([180, 255, 255]))
         red_ring = cv2.bitwise_or(r1, r2)
@@ -285,7 +319,7 @@ class CharacterDetector:
 
         blue_with_corners = cv2.bitwise_or(blue_ring, valid_white_corners)
 
-        # Morphological closing to connect base ring segments broken by pets or pets standing beside feet
+        # Morphological closing to connect base ring segments
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 5))
         closed_blue = cv2.morphologyEx(blue_with_corners, cv2.MORPH_CLOSE, kernel)
         closed_red = cv2.morphologyEx(red_ring, cv2.MORPH_CLOSE, kernel)
@@ -366,18 +400,22 @@ class CharacterDetector:
                 x, y, w, h = base_boxes[int(idx)]
                 bottom_y = y + h
                 sprite_h = max(int(h * 4.8), int(w * 2.4))
-                char_y = max(0, bottom_y - sprite_h)
-                bbox_area = float(w * sprite_h)
-                bbox = BoundingBox(x=x, y=char_y, w=w, h=sprite_h)
-                detections.append(
-                    RawCharacterDetection(
-                        bbox=bbox,
-                        centroid=bbox.centroid,
-                        area=bbox_area,
-                        confidence=0.92,
-                        method="combat_base",
+                pad_h = int(sprite_h * 0.12)
+                sprite_h_padded = sprite_h + pad_h
+                char_y = max(0, bottom_y - sprite_h_padded)
+                bbox_area = float(w * sprite_h_padded)
+
+                if self._filter_box(x, char_y, w, sprite_h_padded, bbox_area):
+                    bbox = BoundingBox(x=x, y=char_y, w=w, h=sprite_h_padded)
+                    detections.append(
+                        RawCharacterDetection(
+                            bbox=bbox,
+                            centroid=bbox.centroid,
+                            area=bbox_area,
+                            confidence=0.92,
+                            method="combat_base",
+                        )
                     )
-                )
 
         logger.debug(f"Combat base detection found {len(detections)} candidates.")
         return detections
@@ -409,10 +447,38 @@ class CharacterDetector:
 
         return merged
 
+    def suppress_pet_candidates(
+        self,
+        detections: list[RawCharacterDetection],
+        proximity_radius: float = 45.0,
+    ) -> list[RawCharacterDetection]:
+        """Suppress small pet-sized candidate crops (20<=w<=30, 20<=h<=38) if a larger candidate exists nearby."""
+        if not detections:
+            return []
+
+        retained: list[RawCharacterDetection] = []
+        for det in detections:
+            w_det = det.bbox.w
+            h_det = det.bbox.h
+            if 20 <= w_det <= 30 and 20 <= h_det <= 38:
+                cx, cy = det.centroid
+                has_nearby_larger = any(
+                    (other is not det)
+                    and (other.area > det.area)
+                    and (np.hypot(cx - other.centroid[0], cy - other.centroid[1]) < proximity_radius)
+                    for other in detections
+                )
+                if has_nearby_larger:
+                    continue
+            retained.append(det)
+
+        return retained
+
     def detect_characters(self, frame: np.ndarray) -> list[RawCharacterDetection]:
         """Run Dofus-specific character detection pipeline combining contour, HSV, and combat base features."""
         candidates = self.detect_contours(frame) + self.detect_hsv_regions(frame) + self.detect_combat_bases(frame)
-        return self.merge_candidates(candidates)
+        merged = self.merge_candidates(candidates)
+        return self.suppress_pet_candidates(merged)
 
     def detect_characters_with_trace(
         self,
@@ -452,23 +518,23 @@ class CharacterDetector:
         for cnt in contours:
             cnt_area = float(cv2.contourArea(cnt))
             x, y, w, h = cv2.boundingRect(cnt)
-            bbox_area = float(w * h)
-            bbox = BoundingBox(x=x, y=y, w=w, h=h)
+            pad_h = int(h * 0.12)
+            h_padded = h + pad_h
+            bbox_area = float(w * h_padded)
+            bbox = BoundingBox(x=x, y=y, w=w, h=h_padded)
 
             cid = candidate_counter
             candidate_counter += 1
 
-            passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            passed, filter_reason = self._filter_box_with_reason(x, y, w, h_padded, bbox_area, cnt_area)
             fill_ratio = cnt_area / bbox_area if bbox_area > 0 else 0.0
-            edge_region = edges[y : y + h, x : x + w]
-            edge_density = float(np.count_nonzero(edge_region) / bbox_area) if bbox_area > 0 else 0.0
 
             diagnostics = self._compute_candidate_diagnostics(
                 frame=frame,
                 hsv=None,
                 edges=edges,
-                bbox=(x, y, w, h),
-                mask_crop=closed_contours[y : y + h, x : x + w],
+                bbox=(x, y, w, h_padded),
+                mask_crop=closed_contours[y : y + h_padded, x : x + w],
                 cnt_area=cnt_area,
                 base_diag={
                     "contour_area": cnt_area,
@@ -529,7 +595,7 @@ class CharacterDetector:
             cid = candidate_counter
             candidate_counter += 1
 
-            passed, filter_reason = self._filter_box_with_reason(w, h, bbox_area, cnt_area)
+            passed, filter_reason = self._filter_box_with_reason(x, y, w, h, bbox_area, cnt_area)
             mask_crop = closed_hsv[y : y + h, x : x + w]
             fill_ratio = round(cnt_area / bbox_area, 4) if bbox_area > 0 else 0.0
 
@@ -679,9 +745,11 @@ class CharacterDetector:
                 c_info = filtered_base_candidates[int(idx)]
                 bottom_y = y + h
                 sprite_h = max(int(h * 4.8), int(w * 2.4))
-                char_y = max(0, bottom_y - sprite_h)
-                bbox_area = float(w * sprite_h)
-                bbox = BoundingBox(x=x, y=char_y, w=w, h=sprite_h)
+                pad_h = int(sprite_h * 0.12)
+                sprite_h_padded = sprite_h + pad_h
+                char_y = max(0, bottom_y - sprite_h_padded)
+                bbox_area = float(w * sprite_h_padded)
+                bbox = BoundingBox(x=x, y=char_y, w=w, h=sprite_h_padded)
 
                 cid = candidate_counter
                 candidate_counter += 1
@@ -692,7 +760,7 @@ class CharacterDetector:
                     frame=frame,
                     hsv=hsv,
                     edges=edges,
-                    bbox=(x, char_y, w, sprite_h),
+                    bbox=(x, char_y, w, sprite_h_padded),
                     mask_crop=mask_crop,
                     cnt_area=float(c_info["mask_area"]),
                     base_diag={
@@ -710,6 +778,8 @@ class CharacterDetector:
                     },
                 )
 
+                passed, filter_reason = self._filter_box_with_reason(x, char_y, w, sprite_h_padded, bbox_area, float(c_info["mask_area"]))
+
                 triggered_rules = [
                     "hsv_color_ring_pass",
                     "dim_aspect_ratio_pass",
@@ -719,7 +789,7 @@ class CharacterDetector:
 
                 lifecycle = [
                     {"stage": "combat_base_detection", "accepted": True, "reason": "ring_base_extracted"},
-                    {"stage": "filtering", "accepted": True, "reason": "passed_filtering"},
+                    {"stage": "filtering", "accepted": passed, "reason": filter_reason},
                 ]
 
                 det = RawCharacterDetection(
@@ -729,14 +799,15 @@ class CharacterDetector:
                     confidence=0.92,
                     method="combat_base",
                     candidate_id=cid,
-                    accepted=True,
-                    reason="passed_filtering",
+                    accepted=passed,
+                    reason=filter_reason,
                     lifecycle=lifecycle,
                     diagnostics=diagnostics,
                     triggered_rules=triggered_rules,
                 )
                 all_candidates.append(det)
-                combat_base_accepted.append(det)
+                if passed:
+                    combat_base_accepted.append(det)
 
         candidates_passed_filtering = contour_accepted + hsv_accepted + combat_base_accepted
         after_filtering_count = len(candidates_passed_filtering)
@@ -760,9 +831,8 @@ class CharacterDetector:
             for idx, candidate in enumerate(candidates_passed_filtering):
                 if idx in kept_set:
                     candidate.lifecycle.append({"stage": "nms", "accepted": True, "reason": "retained_by_nms"})
-                    candidate.lifecycle.append({"stage": "final_selection", "accepted": True, "reason": "final_selected"})
                     candidate.accepted = True
-                    candidate.reason = "final_selected"
+                    candidate.reason = "retained_by_nms"
                     if "nms_survived" not in candidate.triggered_rules:
                         candidate.triggered_rules.append("nms_survived")
                     merged_accepted.append(candidate)
@@ -771,6 +841,31 @@ class CharacterDetector:
                     candidate.lifecycle.append({"stage": "final_selection", "accepted": False, "reason": "suppressed_by_nms"})
                     candidate.accepted = False
                     candidate.reason = "suppressed_by_nms"
+
+        # --- STAGE 5: PET SUPPRESSION ---
+        final_entities: list[RawCharacterDetection] = []
+        for det in merged_accepted:
+            w_det = det.bbox.w
+            h_det = det.bbox.h
+            if 20 <= w_det <= 30 and 20 <= h_det <= 38:
+                cx, cy = det.centroid
+                has_nearby_larger = any(
+                    (other is not det)
+                    and (other.area > det.area)
+                    and (np.hypot(cx - other.centroid[0], cy - other.centroid[1]) < 45.0)
+                    for other in merged_accepted
+                )
+                if has_nearby_larger:
+                    det.lifecycle.append({"stage": "pet_suppression", "accepted": False, "reason": "suppressed_pet_candidate"})
+                    det.lifecycle.append({"stage": "final_selection", "accepted": False, "reason": "suppressed_pet_candidate"})
+                    det.accepted = False
+                    det.reason = "suppressed_pet_candidate"
+                    continue
+
+            det.lifecycle.append({"stage": "final_selection", "accepted": True, "reason": "final_selected"})
+            det.accepted = True
+            det.reason = "final_selected"
+            final_entities.append(det)
 
         after_nms_count = len(merged_accepted)
         rejected_candidates = [c for c in all_candidates if not c.accepted]
@@ -787,11 +882,11 @@ class CharacterDetector:
             "raw_combat_bases": raw_combat_bases_count,
             "after_filtering": after_filtering_count,
             "after_nms": after_nms_count,
-            "final_entities": len(merged_accepted),
+            "final_entities": len(final_entities),
         }
 
         return {
-            "raw_characters": merged_accepted,
+            "raw_characters": final_entities,
             "rejected_characters": rejected_candidates,
             "all_candidates": all_candidates,
             "stage_masks": stage_masks,

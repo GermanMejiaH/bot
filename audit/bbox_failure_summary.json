@@ -1,0 +1,34 @@
+{
+  "total_samples": 39,
+  "annotated_samples": 39,
+  "unannotated_samples": 0,
+  "failure_counts": {
+    "LEFT_CLIPPED": 1,
+    "RIGHT_CLIPPED": 3,
+    "TOP_CLIPPED": 0,
+    "BOTTOM_CLIPPED": 6,
+    "PET_ONLY": 5,
+    "MULTI_ENTITY_FRAGMENT": 3,
+    "MULTI_TILE": 0,
+    "GROUND_TILE": 0,
+    "ENTITY_PLUS_TERRAIN": 16,
+    "ENTITY_PLUS_UI": 0,
+    "UNCERTAIN": 5,
+    "OTHER_UNCLASSIFIED": 0
+  },
+  "failure_percentages": {
+    "LEFT_CLIPPED": 2.56,
+    "RIGHT_CLIPPED": 7.69,
+    "TOP_CLIPPED": 0.0,
+    "BOTTOM_CLIPPED": 15.38,
+    "PET_ONLY": 12.82,
+    "MULTI_ENTITY_FRAGMENT": 7.69,
+    "MULTI_TILE": 0.0,
+    "GROUND_TILE": 0.0,
+    "ENTITY_PLUS_TERRAIN": 41.03,
+    "ENTITY_PLUS_UI": 0.0,
+    "UNCERTAIN": 12.82,
+    "OTHER_UNCLASSIFIED": 0.0
+  },
+  "dominant_failure_mode": "ENTITY_PLUS_TERRAIN"
+}

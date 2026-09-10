@@ -1,0 +1,38 @@
+{
+  "candidate_id": 569,
+  "filename": "candidate_0569_hsv.png",
+  "method": "hsv",
+  "bbox": [
+    403,
+    757,
+    24,
+    37
+  ],
+  "area": 888.0,
+  "confidence": 0.88,
+  "frame_id": "frame_20260907_214908_280671_frame_000023",
+  "source_folder": "combat",
+  "diagnostics": {
+    "contour_area": 388.5,
+    "fill_ratio": 0.4375,
+    "bbox_width": 24,
+    "bbox_height": 37,
+    "bbox_area": 888.0,
+    "aspect_ratio": 1.5417,
+    "edge_density": 0.2083,
+    "mean_h": 35.69,
+    "mean_s": 246.18,
+    "mean_v": 80.41,
+    "std_h": 1.94,
+    "std_s": 31.94,
+    "std_v": 24.27,
+    "dominant_hue": 36,
+    "gray_variance": 518.4,
+    "laplacian_variance": 742.77,
+    "gradient_magnitude_mean": 58.97,
+    "extent": 0.4375,
+    "mask_ratio": 0.4966,
+    "connected_component_count": 2,
+    "largest_connected_component_ratio": 0.4955
+  }
+}

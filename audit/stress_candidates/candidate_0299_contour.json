@@ -1,0 +1,39 @@
+{
+  "candidate_id": 299,
+  "filename": "candidate_0299_contour.png",
+  "method": "contour",
+  "bbox": [
+    667,
+    599,
+    66,
+    36
+  ],
+  "area": 2376.0,
+  "confidence": 0.85,
+  "frame_id": "frame_20260907_222107_077035_audit_0146",
+  "source_folder": "exploration",
+  "diagnostics": {
+    "contour_area": 207.0,
+    "bounding_rect_area": 2376.0,
+    "fill_ratio": 0.0871,
+    "bbox_width": 66,
+    "bbox_height": 36,
+    "bbox_area": 2376.0,
+    "aspect_ratio": 0.5455,
+    "edge_density": 0.0758,
+    "mean_h": 21.72,
+    "mean_s": 100.87,
+    "mean_v": 20.1,
+    "std_h": 3.08,
+    "std_s": 18.73,
+    "std_v": 7.25,
+    "dominant_hue": 23,
+    "gray_variance": 46.13,
+    "laplacian_variance": 38.68,
+    "gradient_magnitude_mean": 16.19,
+    "extent": 0.0871,
+    "mask_ratio": 0.1305,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.1305
+  }
+}

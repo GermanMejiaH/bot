@@ -1,0 +1,209 @@
+{
+  "evaluation_date": "evaluate_stress_dataset.py",
+  "dataset_name": "Phase 4C.5 Stress Validation Dataset",
+  "sample_size": 144,
+  "true_positives_count": 23,
+  "false_positives_count": 121,
+  "threshold": 0.5,
+  "baseline_heuristic": {
+    "accuracy": 0.1597222222222222,
+    "precision": 0.1597222222222222,
+    "recall": 1.0,
+    "f1": 0.2754491017964072,
+    "pr_auc": 0.0,
+    "roc_auc": 0.0,
+    "confusion_matrix": [
+      [
+        0,
+        121
+      ],
+      [
+        0,
+        23
+      ]
+    ]
+  },
+  "visual_classifier": {
+    "accuracy": 0.8194444444444444,
+    "precision": 0.46511627906976744,
+    "recall": 0.8695652173913043,
+    "f1": 0.6060606060606061,
+    "pr_auc": 0.7456872674613337,
+    "roc_auc": 0.9164570607258354,
+    "confusion_matrix": [
+      [
+        98,
+        23
+      ],
+      [
+        3,
+        20
+      ]
+    ]
+  },
+  "gains": {
+    "precision_gain": 0.3053940568475452,
+    "recall_gain": -0.13043478260869568,
+    "f1_gain": 0.3306115042641989
+  },
+  "per_detector_breakdown": {
+    "contour": {
+      "total_candidates": 44,
+      "true_positives": 3,
+      "false_positives": 41,
+      "baseline": {
+        "accuracy": 0.06818181818181818,
+        "precision": 0.06818181818181818,
+        "recall": 1.0,
+        "f1": 0.1276595744680851,
+        "pr_auc": 0.0,
+        "roc_auc": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            41
+          ],
+          [
+            0,
+            3
+          ]
+        ]
+      },
+      "classifier": {
+        "accuracy": 0.7954545454545454,
+        "precision": 0.2,
+        "recall": 0.6666666666666666,
+        "f1": 0.3076923076923077,
+        "pr_auc": 0.6180555555555556,
+        "roc_auc": 0.9065040650406503,
+        "confusion_matrix": [
+          [
+            33,
+            8
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "precision_gain": 0.13181818181818183,
+      "f1_gain": 0.1800327332242226
+    },
+    "hsv": {
+      "total_candidates": 50,
+      "true_positives": 6,
+      "false_positives": 44,
+      "baseline": {
+        "accuracy": 0.12,
+        "precision": 0.12,
+        "recall": 1.0,
+        "f1": 0.21428571428571427,
+        "pr_auc": 0.0,
+        "roc_auc": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            44
+          ],
+          [
+            0,
+            6
+          ]
+        ]
+      },
+      "classifier": {
+        "accuracy": 0.8,
+        "precision": 0.35714285714285715,
+        "recall": 0.8333333333333334,
+        "f1": 0.5,
+        "pr_auc": 0.8703703703703703,
+        "roc_auc": 0.9204545454545454,
+        "confusion_matrix": [
+          [
+            35,
+            9
+          ],
+          [
+            1,
+            5
+          ]
+        ]
+      },
+      "precision_gain": 0.23714285714285716,
+      "f1_gain": 0.2857142857142857
+    },
+    "combat_base": {
+      "total_candidates": 50,
+      "true_positives": 14,
+      "false_positives": 36,
+      "baseline": {
+        "accuracy": 0.28,
+        "precision": 0.28,
+        "recall": 1.0,
+        "f1": 0.4375,
+        "pr_auc": 0.0,
+        "roc_auc": 0.0,
+        "confusion_matrix": [
+          [
+            0,
+            36
+          ],
+          [
+            0,
+            14
+          ]
+        ]
+      },
+      "classifier": {
+        "accuracy": 0.86,
+        "precision": 0.6842105263157895,
+        "recall": 0.9285714285714286,
+        "f1": 0.7878787878787878,
+        "pr_auc": 0.8962885154061625,
+        "roc_auc": 0.9404761904761905,
+        "confusion_matrix": [
+          [
+            30,
+            6
+          ],
+          [
+            1,
+            13
+          ]
+        ]
+      },
+      "precision_gain": 0.40421052631578946,
+      "f1_gain": 0.35037878787878785
+    }
+  },
+  "distribution_shift_analysis": {
+    "phase4c_dataset": {
+      "total_candidates": 152,
+      "true_positives": 40,
+      "false_positives": 112,
+      "positive_rate": 0.2631578947368421,
+      "unique_source_frames": 41,
+      "holdout_candidates": 37,
+      "holdout_precision": 1.0,
+      "holdout_recall": 1.0,
+      "holdout_f1": 1.0
+    },
+    "phase4c5_stress_dataset": {
+      "total_candidates": 144,
+      "true_positives": 23,
+      "false_positives": 121,
+      "positive_rate": 0.1597222222222222,
+      "unique_source_frames": 79,
+      "stress_precision": 0.46511627906976744,
+      "stress_recall": 0.8695652173913043,
+      "stress_f1": 0.6060606060606061
+    },
+    "delta": {
+      "positive_rate_shift": -0.10343567251461988,
+      "precision_drop": -0.5348837209302326,
+      "recall_drop": -0.13043478260869568,
+      "f1_drop": -0.3939393939393939
+    }
+  }
+}

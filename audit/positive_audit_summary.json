@@ -1,0 +1,22 @@
+{
+  "total_samples": 100,
+  "annotated_samples": 100,
+  "unannotated_samples": 0,
+  "category_counts": {
+    "VALID_ENTITY": 60,
+    "PARTIAL_ENTITY": 23,
+    "DECORATION": 0,
+    "OVERSIZED_BBOX": 16,
+    "UNCERTAIN": 1,
+    "OTHER_UNCLASSIFIED": 0
+  },
+  "category_percentages": {
+    "VALID_ENTITY": 60.0,
+    "PARTIAL_ENTITY": 23.0,
+    "DECORATION": 0.0,
+    "OVERSIZED_BBOX": 16.0,
+    "UNCERTAIN": 1.0,
+    "OTHER_UNCLASSIFIED": 0.0
+  },
+  "dominant_error_source": "PARTIAL_ENTITY"
+}

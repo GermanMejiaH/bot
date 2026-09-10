@@ -1,11 +1,11 @@
 {
   "total_frames_audited": 1,
-  "audit_timestamp": "2026-09-08T02:57:34.500633+00:00",
+  "audit_timestamp": "2026-09-10T04:37:04.287470+00:00",
   "frames": [
     {
       "frame_id": "frame_ev_1",
       "audit_sequence": 1,
-      "timestamp": "2026-09-08T02:57:34.495415+00:00",
+      "timestamp": "2026-09-10T04:37:04.282933+00:00",
       "game_state": {
         "combat": false,
         "combat_score": 0,

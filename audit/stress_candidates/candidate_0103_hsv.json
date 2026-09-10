@@ -1,0 +1,38 @@
+{
+  "candidate_id": 103,
+  "filename": "candidate_0103_hsv.png",
+  "method": "hsv",
+  "bbox": [
+    520,
+    291,
+    16,
+    17
+  ],
+  "area": 272.0,
+  "confidence": 0.88,
+  "frame_id": "frame_20260907_221504_300832_audit_0050",
+  "source_folder": "exploration",
+  "diagnostics": {
+    "contour_area": 227.5,
+    "fill_ratio": 0.8364,
+    "bbox_width": 16,
+    "bbox_height": 17,
+    "bbox_area": 272.0,
+    "aspect_ratio": 1.0625,
+    "edge_density": 0.3603,
+    "mean_h": 98.08,
+    "mean_s": 132.2,
+    "mean_v": 226.61,
+    "std_h": 21.14,
+    "std_s": 93.11,
+    "std_v": 21.76,
+    "dominant_hue": 102,
+    "gray_variance": 3525.84,
+    "laplacian_variance": 13697.95,
+    "gradient_magnitude_mean": 216.74,
+    "extent": 0.8364,
+    "mask_ratio": 0.9449,
+    "connected_component_count": 1,
+    "largest_connected_component_ratio": 0.9449
+  }
+}
